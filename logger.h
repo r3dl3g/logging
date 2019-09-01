@@ -332,7 +332,7 @@ namespace logging {\
   EXP core& get_logging_core();\
 } // namespace logging
 
-#if !defined(BASEPP_BUILT_AS_STATIC)
+#if !defined(LOGGING_BUILT_AS_STATIC)
 DECLARE_LOGGING_CORE(LOGGING_EXPORT)
 #endif
 
