@@ -326,20 +326,15 @@ namespace logging {
 
 
 /**
-* Macro to declare the login core singleton.
-*
 * Since statics are not shared over DLL boundaries, we have
 * to handle this in a special manner.
-* If you build logging as static library, you have to decide in
+* If you build logging as static library, we have to decide in
 * which module the core of logging resists.
 */
-#define DECLARE_LOGGING_CORE(EXP) \
-namespace logging {\
-  EXP core& get_logging_core();\
-} // namespace logging
-
 #if !defined(LOGGING_BUILT_AS_STATIC_LIB)
-DECLARE_LOGGING_CORE(LOGGING_EXPORT)
+namespace logging {
+  LOGGING_EXPORT core& get_logging_core();
+} // namespace logging
 #endif
 
 /**
