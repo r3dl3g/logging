@@ -50,7 +50,7 @@
 #include "time_util.h"
 
 
-#if !defined(LOGGING_BUILT_AS_STATIC)
+#if !defined(LOGGING_BUILT_AS_STATIC_LIB)
 DEFINE_LOGGING_CORE(LOGGING_EXPORT)
 #else
 DECLARE_LOGGING_CORE(extern)
