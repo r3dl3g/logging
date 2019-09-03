@@ -302,11 +302,11 @@ namespace logging {
 #include "logger.inl"
 
 /// Log macro trace
-#if defined(ENABLE_TRACE)
+#if defined(LOGGING_ENABLE_TRACE)
 # define LogTrace logging::recorder (logging::level::trace)
 #else
 # define LogTrace logging::null_recoder ()
-#endif // ENABLE_TRACE
+#endif // LOGGING_ENABLE_TRACE
 
 /// Log macro debug
 #if defined(NDEBUG)
@@ -324,22 +324,31 @@ namespace logging {
 /// Log macro fatal
 #define LogFatal logging::recorder (logging::level::fatal)
 
+
 /**
 * Macro to declare the login core singleton.
+*
+* Since statics are not shared over DLL boundaries, we have
+* to handle this in a special manner.
+* If you build logging as static library, you have to decide in
+* which module the core of logging resists.
 */
 #define DECLARE_LOGGING_CORE(EXP) \
 namespace logging {\
   EXP core& get_logging_core();\
 } // namespace logging
 
-#if !defined(LOGGING_BUILT_AS_STATIC)
+#if !defined(LOGGING_BUILT_AS_STATIC_LIB)
 DECLARE_LOGGING_CORE(LOGGING_EXPORT)
 #endif
 
 /**
 * Macro to define the login core singleton.
+*
 * Since statics are not shared over DLL boundaries, implement this somewhere
-* where you can ensure, that it will ony be instantiated once.
+* where you can ensure, that it will only be instantiated once.
+* Usualy this will be in the main module, where your gui_main resist.
+*
 *
 * in C++11 statics are "magic statics" and their initialization _is_ thread safe.
 * @see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2660.htm
@@ -352,8 +361,8 @@ DECLARE_LOGGING_CORE(LOGGING_EXPORT)
 #define DEFINE_LOGGING_CORE(EXP) \
 namespace logging {\
   EXP logging::core& get_logging_core() {\
-  static logging::core s_logging_core; \
-  return s_logging_core; \
+    static logging::core s_logging_core; \
+    return s_logging_core; \
   }\
 } // namespace logging
 

@@ -6,7 +6,7 @@ project("logging" CXX)
 
 include (GenerateExportHeader)
 
-set(LOGGING_BUILD_STATIC_MODULE_LIBS ON CACHE BOOL "On to build a static library for each submodule, Off for shared library. default On")
+set(LOGGING_BUILD_STATIC_MODULE_LIB ON CACHE BOOL "On to build a static library for each submodule, Off for shared library. default On")
 
 if(NOT TARGET logging-obj)
 
@@ -26,9 +26,9 @@ if(NOT TARGET logging-obj)
         set (logging_sys_libraries stdc++fs pthread)
     endif()
 
-    if (LOGGING_BUILD_STATIC_MODULE_LIBS)
+    if (LOGGING_BUILD_STATIC_MODULE_LIB)
         set (logging_libraries logging-static)
-        set (logging_defines "-DLOGGING_BUILT_AS_STATIC")
+        set (logging_defines "-DLOGGING_BUILT_AS_STATIC_LIB")
     else()
         set (logging_libraries logging)
     endif()
@@ -67,7 +67,7 @@ if(NOT TARGET logging-obj)
 
     set_target_properties(logging-obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-    if(LOGGING_BUILD_STATIC_MODULE_LIBS)
+    if(LOGGING_BUILD_STATIC_MODULE_LIB)
         add_library(logging-static STATIC $<TARGET_OBJECTS:logging-obj>)
     else()
         add_library(logging SHARED $<TARGET_OBJECTS:logging-obj>)
@@ -84,7 +84,7 @@ if(NOT TARGET logging-obj)
         BASE_NAME LOGGING
         EXPORT_MACRO_NAME LOGGING_EXPORT
         EXPORT_FILE_NAME logging-export.h
-        STATIC_DEFINE LOGGING_BUILT_AS_STATIC
+        STATIC_DEFINE LOGGING_BUILT_AS_STATIC_LIB
     )
 
 endif()
