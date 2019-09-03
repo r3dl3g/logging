@@ -139,65 +139,26 @@ namespace logging {
   /**
     * Blocking (waiting) thread safe queue.
     */
-  template<typename T>
-  struct LOGGING_EXPORT queue {
+  struct LOGGING_EXPORT message_queue {
 
     /// Enqueue an item and send signal to a waiting dequeuer.
-    void enqueue (T&& t) {
-      {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_queue.push(std::move(t));
-      }
-      m_condition.notify_one();
-    }
+    void enqueue (record&& t);
 
     /// Dequeue an item if available, else waits until a new item is enqueued.
-    T dequeue () {
-      std::unique_lock<std::mutex> lock(m_mutex);
-
-      wait_until_not_empty(lock);
-
-      if (m_queue.empty()) {
-        return T();
-      }
-
-      T item = m_queue.front();
-      m_queue.pop();
-      return item;
-    }
+    record dequeue ();
 
     /// Dequeue an item if available and return true, else return false.
-    bool try_dequeue (T& t) {
-      std::unique_lock<std::mutex> lock(m_mutex);
-
-      if (m_queue.empty()) {
-        return false;
-      }
-
-      t = m_queue.front();
-      m_queue.pop();
-      return true;
-    }
+    bool try_dequeue (record& t);
 
     /// Waits until the queue is empty for maximum timeout time span.
-    void wait_until_empty (const std::chrono::milliseconds& timeout) {
-      std::unique_lock<std::mutex> lock(m_mutex);
-
-      m_condition.wait_for(lock, timeout, [this]() {
-        return m_queue.empty();
-      });
-    }
+    void wait_until_empty (const std::chrono::milliseconds& timeout);
 
     /// Waits until the queue is no more empty.
-    void wait_until_not_empty (std::unique_lock<std::mutex> &lock) {
-      m_condition.wait(lock, [this] () -> bool {
-                         return !m_queue.empty();
-                       });
-    }
+    void wait_until_not_empty (std::unique_lock<std::mutex> &lock);
 
   private:
     /// The queue to store the items in.
-    std::queue<T> m_queue;
+    std::queue<record> m_queue;
 
     /// Condition to signal new item to dequeuer.
     std::condition_variable m_condition;
@@ -253,7 +214,6 @@ namespace logging {
     typedef std::vector<sink> sink_list;
     sink_list m_sinks;
 
-    typedef queue<record> message_queue;
     message_queue m_messages;
 
     std::thread m_sink_thread;
