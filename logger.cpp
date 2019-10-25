@@ -46,8 +46,10 @@
 //
 // Library includes
 //
+#include <util/time_util.h>
+#include <util/ostream_resetter.h>
+
 #include "logger.h"
-#include "time_util.h"
 
 
 #if !defined(LOGGING_BUILT_AS_STATIC_LIB)
@@ -80,12 +82,12 @@ namespace logging {
     return out;
   }
 
-  std::ostream& operator << (std::ostream& out, time::time_point const& tp) {
-    return time::format_time(out, tp, "-", " ", ":", true);
+  std::ostream& operator << (std::ostream& out, std::chrono::system_clock::time_point const& tp) {
+    return util::time::format_time(out, tp, "-", " ", ":", true);
   }
 
   std::ostream& operator << (std::ostream& out, line_id const& id) {
-    ostream_resetter r(out);
+    util::ostream_resetter r(out);
     out << std::setw(4) << std::setfill('0') << id.n;
     return out;
   }
@@ -163,7 +165,7 @@ namespace logging {
     }
   }
 
-  record::record (const time::time_point& time_point,
+  record::record (const std::chrono::system_clock::time_point& time_point,
                   logging::level lvl,
                   const std::string& thread_name,
                   const line_id& line,
@@ -176,7 +178,7 @@ namespace logging {
   {}
 
   record::record ()
-    : m_time_point(time::time_point())
+    : m_time_point(std::chrono::system_clock::time_point())
     , m_level(logging::level::undefined)
     , m_thread_name(t_thread_name)
   {}
@@ -233,7 +235,7 @@ namespace logging {
   }
 
   void core::log (level lvl,
-                  const time::time_point& time_point,
+                  const std::chrono::system_clock::time_point& time_point,
                   const std::string& message) {
     unsigned int id = ++m_line_id;
     record r(time_point, lvl, t_thread_name, id, message);
