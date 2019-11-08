@@ -70,5 +70,13 @@ namespace logging {
     return m_buffer;
   }
 
+  inline std::ostream& recorder::stream () {
+    return m_buffer;
+  }
+
+  inline bool recorder::is_raw () const {
+    return unescaped;
+  }
+
 
 } // namespace logging

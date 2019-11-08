@@ -83,7 +83,7 @@ namespace logging {
   }
 
   std::ostream& operator << (std::ostream& out, std::chrono::system_clock::time_point const& tp) {
-    return util::time::format_time(out, tp, "-", " ", ":", true);
+    return util::time::format_datetime(out, tp, "-", " ", ":", true);
   }
 
   std::ostream& operator << (std::ostream& out, line_id const& id) {
@@ -314,6 +314,7 @@ namespace logging {
   recorder::recorder (logging::level lvl)
     : m_time_point(std::chrono::system_clock::now())
     , m_level(lvl)
+    , unescaped(false)
   {}
 
   recorder::~recorder () {
@@ -321,15 +322,23 @@ namespace logging {
   }
 
   recorder& recorder::operator<< (const char value) {
-    escape_filter(m_buffer, value);
+    if (unescaped) {
+      m_buffer << value;
+    } else {
+      escape_filter(m_buffer, value);
+    }
     return *this;
   }
 
   recorder& recorder::operator<< (const char* value) {
     if (value) {
-      while (*value) {
-        escape_filter(m_buffer, *value);
-        ++value;
+      if (unescaped) {
+        m_buffer << value;
+      } else {
+        while (*value) {
+          escape_filter(m_buffer, *value);
+          ++value;
+        }
       }
     }
     return *this;
@@ -337,6 +346,16 @@ namespace logging {
 
   recorder& recorder::endl () {
     m_buffer << std::endl;
+    return *this;
+  }
+
+  recorder& recorder::raw () {
+    unescaped = true;
+    return *this;
+  }
+
+  recorder& recorder::escaped () {
+    unescaped = false;
     return *this;
   }
 
