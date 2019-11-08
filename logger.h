@@ -221,12 +221,17 @@ namespace logging {
     recorder& operator<< (const std::string& value);
 
     recorder& endl ();
+    recorder& raw ();
+    recorder& escaped ();
+    bool is_raw () const;
 
     operator std::ostream& ();
+    std::ostream& stream ();
 
   private:
     std::chrono::system_clock::time_point m_time_point;
     level m_level;
+    bool unescaped;
     std::ostringstream m_buffer;
   };
 
