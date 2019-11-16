@@ -53,6 +53,9 @@ if(NOT TARGET logging-obj)
     set (LOGGING_VERSION_PATCH 0)
     set (LOGGING_VERSION "${LOGGING_VERSION_MAJOR}.${LOGGING_VERSION_MINOR}.${LOGGING_VERSION_PATCH}")
 
+    set (LOGGING_INCLUDE_INSTALL_DIR include/guipp/logging)
+    set (LOGGING_LIBRARY_INSTALL_DIR lib/guipp)
+
     include_directories(${logging_include})
 
     # header file to pass version settings to the source code
@@ -62,6 +65,7 @@ if(NOT TARGET logging-obj)
     )
 
     file(GLOB SOURCE_FILES "*.h" "*.cpp" "*.inl")
+    file(GLOB INCLUDE_FILES "*.h" "*.inl")
 
     if (WIN32)
       add_definitions(-DWIN32_LEAN_AND_MEAN)
@@ -75,6 +79,7 @@ if(NOT TARGET logging-obj)
 
     if(LOGGING_BUILD_STATIC_MODULE_LIB)
         add_library(logging-static STATIC $<TARGET_OBJECTS:logging-obj>)
+        install(TARGETS logging-static DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
     else()
         add_library(logging SHARED $<TARGET_OBJECTS:logging-obj>)
 
@@ -84,6 +89,7 @@ if(NOT TARGET logging-obj)
                                      POSITION_INDEPENDENT_CODE ON
                                      VERSION ${LOGGING_VERSION}
                                      SOVERSION ${LOGGING_VERSION_MAJOR})
+        install(TARGETS logging DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
     endif()
 
     GENERATE_EXPORT_HEADER(logging-obj
@@ -92,5 +98,10 @@ if(NOT TARGET logging-obj)
         EXPORT_FILE_NAME logging-export.h
         STATIC_DEFINE LOGGING_BUILT_AS_STATIC_LIB
     )
+
+    install(FILES ${INCLUDE_FILES}
+                  ${PROJECT_BINARY_DIR}/logging-export.h
+                  ${PROJECT_BINARY_DIR}/logging_version.h
+            DESTINATION ${LOGGING_INCLUDE_INSTALL_DIR})
 
 endif()
