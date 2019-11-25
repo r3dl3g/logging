@@ -75,7 +75,9 @@ if(NOT TARGET logging-obj)
 
     add_library(logging-obj OBJECT ${SOURCE_FILES})
 
-    set_target_properties(logging-obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(logging-obj PROPERTIES
+                          POSITION_INDEPENDENT_CODE ON
+                          FOLDER libraries)
 
     if(LOGGING_BUILD_STATIC_MODULE_LIB)
         add_library(logging-static STATIC $<TARGET_OBJECTS:logging-obj>)
@@ -86,9 +88,10 @@ if(NOT TARGET logging-obj)
         target_link_libraries(logging PRIVATE ${logging_sys_libraries})
 
         set_target_properties(logging PROPERTIES
-                                     POSITION_INDEPENDENT_CODE ON
-                                     VERSION ${LOGGING_VERSION}
-                                     SOVERSION ${LOGGING_VERSION_MAJOR})
+                              POSITION_INDEPENDENT_CODE ON
+                              FOLDER libraries
+                              VERSION ${LOGGING_VERSION}
+                              SOVERSION ${LOGGING_VERSION_MAJOR})
         install(TARGETS logging DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
     endif()
 
