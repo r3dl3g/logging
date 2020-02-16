@@ -211,6 +211,7 @@ namespace logging {
 
   void core::finish () {
     if (m_is_active) {
+      m_messages.wait_until_empty(std::chrono::milliseconds(500));
       m_is_active = false;
       m_messages.enqueue(record());
       m_sink_thread.join();
