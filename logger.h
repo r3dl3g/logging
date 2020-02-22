@@ -159,6 +159,7 @@ namespace logging {
 
     void start ();
     void finish ();
+    void flush ();
 
     void log (level lvl, const std::string& message);
     void log (level lvl, const std::chrono::system_clock::time_point& time_point, const std::string& message);
@@ -204,6 +205,8 @@ namespace logging {
     void operator= (const core&) = delete;
   };
 
+  struct flush {};
+
   /**
     * Logging recorder. Capture data for one record.
     */
@@ -219,6 +222,7 @@ namespace logging {
     recorder& operator<< (const char value);
     recorder& operator<< (const char* value);
     recorder& operator<< (const std::string& value);
+    recorder& operator<< (const flush&);
 
     recorder& endl ();
     recorder& raw ();
@@ -246,6 +250,8 @@ namespace logging {
 } // namespace logging
 
 #include "logger.inl"
+
+#define NOT_LOGGING_ENABLE_TRACE
 
 /// Log macro trace
 #if defined(LOGGING_ENABLE_TRACE)
