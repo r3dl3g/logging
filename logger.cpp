@@ -218,6 +218,12 @@ namespace logging {
     }
   }
 
+  void core::flush () {
+    if (m_is_active) {
+      m_messages.wait_until_empty(std::chrono::milliseconds(500));
+    }
+  }
+
   record_formatter core::get_standard_formatter () {
     return [](std::ostream& out, const record& e) {
       out << e.line() << '|' << e.time_point() << '|' << e.level() << '|' << e.thread_name() << '|' << e.message() << std::endl;
@@ -342,6 +348,11 @@ namespace logging {
         }
       }
     }
+    return *this;
+  }
+
+  recorder& recorder::operator<< (const flush&) {
+    core::instance().flush();
     return *this;
   }
 
