@@ -45,7 +45,7 @@
 /// Log macro warning
 #define log_warn logging::recorder (logging::level::warning)
 /// Log macro error
-#define log_err logging::recorder (logging::level::error)
+#define log_error logging::recorder (logging::level::error)
 /// Log macro fatal
 #define log_fatal logging::recorder (logging::level::fatal)
 
