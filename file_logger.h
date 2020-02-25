@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "logger.h"
+#include <logging/core.h>
 #include <fstream>
 
 /**
