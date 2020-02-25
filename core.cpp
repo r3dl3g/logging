@@ -63,7 +63,6 @@ namespace logging {
 // namespace logging
 #endif
 
-
 namespace logging {
 
 #if (defined WIN32 || defined _WIN32 || defined WINCE || defined __CYGWIN__) && !defined(thread_local)

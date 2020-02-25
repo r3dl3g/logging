@@ -31,10 +31,10 @@
 #endif
 
 // --------------------------------------------------------------------------
-//
+//2
 // Library includes
 //
-#include "redirect_stream.h"
+#include <logging/redirect_stream.h>
 
 
 /**
