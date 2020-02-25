@@ -46,10 +46,9 @@
 //
 // Library includes
 //
-#include <util/time_util.h>
-#include <util/ostream_resetter.h>
 
-#include "logger.h"
+#include <logging/core.h>
+#include <logging/recorder.h>
 
 
 #if !defined(LOGGING_BUILT_AS_STATIC_LIB)
@@ -71,90 +70,7 @@ namespace logging {
 # define thread_local __declspec(thread)
 #endif
 
-  static thread_local const char* t_thread_name = "main";
-
-  static const char* s_log_level_strings[] = {
-    "undef", "trace", "debug", "info ", "warn ", "error", "fatal"
-  };
-
-  std::ostream& operator << (std::ostream& out, level const& lvl) {
-    out << s_log_level_strings[static_cast<int>(lvl)];
-    return out;
-  }
-
-  std::ostream& operator << (std::ostream& out, std::chrono::system_clock::time_point const& tp) {
-    return util::time::format_datetime(out, tp, "-", " ", ":", true);
-  }
-
-  std::ostream& operator << (std::ostream& out, line_id const& id) {
-    util::ostream_resetter r(out);
-    out << std::setw(4) << std::setfill('0') << id.n;
-    return out;
-  }
-
-  std::ostream& operator << (std::ostream& out, const std::exception& ex) {
-#if !defined(NDEBUG) && defined(USE_BOOST)
-    out << boost::current_exception_diagnostic_information();
-#else
-    out << ex.what();
-#endif
-    return out;
-  }
-
-  /// Enqueue an item and send signal to a waiting dequeuer.
-  void message_queue::enqueue (record&& t) {
-    {
-      std::lock_guard<std::mutex> lock(m_mutex);
-      m_queue.push(std::move(t));
-    }
-    m_condition.notify_all();
-  }
-
-  /// Dequeue an item if available, else waits until a new item is enqueued.
-  record message_queue::dequeue () {
-    std::unique_lock<std::mutex> lock(m_mutex);
-
-    wait_until_not_empty(lock);
-
-    if (m_queue.empty()) {
-      return record();
-    }
-
-    record item = m_queue.front();
-    m_queue.pop();
-    m_condition.notify_all();
-    return item;
-  }
-
-  /// Dequeue an item if available and return true, else return false.
-  bool message_queue::try_dequeue (record& t) {
-    std::unique_lock<std::mutex> lock(m_mutex);
-
-    if (m_queue.empty()) {
-      return false;
-    }
-
-    t = m_queue.front();
-    m_queue.pop();
-    m_condition.notify_all();
-    return true;
-  }
-
-  /// Waits until the queue is empty for maximum timeout time span.
-  void message_queue::wait_until_empty (const std::chrono::milliseconds& timeout) {
-    std::unique_lock<std::mutex> lock(m_mutex);
-
-    m_condition.wait_for(lock, timeout, [&]() {
-      return m_queue.empty();
-    });
-  }
-
-  /// Waits until the queue is no more empty.
-  void message_queue::wait_until_not_empty (std::unique_lock<std::mutex> &lock) {
-    m_condition.wait(lock, [&] () -> bool {
-                       return !m_queue.empty();
-                     });
-  }
+  thread_local const char* t_thread_name = "main";
 
   void core::logging_sink_call (core* core) {
     while (core->m_is_active) {
@@ -164,24 +80,6 @@ namespace logging {
       } while (core->m_messages.try_dequeue(entry));
     }
   }
-
-  record::record (const std::chrono::system_clock::time_point& time_point,
-                  logging::level lvl,
-                  const std::string& thread_name,
-                  const line_id& line,
-                  const std::string& message)
-    : m_time_point(time_point)
-    , m_level(lvl)
-    , m_thread_name(thread_name)
-    , m_line(line)
-    , m_message(message)
-  {}
-
-  record::record ()
-    : m_time_point(std::chrono::system_clock::time_point())
-    , m_level(logging::level::undefined)
-    , m_thread_name(t_thread_name)
-  {}
 
   core::core ()
     : m_is_active(false)
@@ -303,74 +201,6 @@ namespace logging {
     return get_logging_core();
   }
 
-  void escape_filter (std::ostream& out,
-                      char ch) {
-    switch (ch) {
-      case '\0': out << "\\0"; break;
-      case '\a': out << "\\a"; break;
-      case '\b': out << "\\b"; break;
-      case '\f': out << "\\f"; break;
-      case '\n': out << "\\n"; break;
-      case '\r': out << "\\r"; break;
-      case '\t': out << "\\t"; break;
-      case '\v': out << "\\v"; break;
-      default:   out << ch; break;
-    }
-  }
-
-  recorder::recorder (logging::level lvl)
-    : m_time_point(std::chrono::system_clock::now())
-    , m_level(lvl)
-    , unescaped(false)
-  {}
-
-  recorder::~recorder () {
-    core::instance().log(m_level, m_time_point, m_buffer.str());
-  }
-
-  recorder& recorder::operator<< (const char value) {
-    if (unescaped) {
-      m_buffer << value;
-    } else {
-      escape_filter(m_buffer, value);
-    }
-    return *this;
-  }
-
-  recorder& recorder::operator<< (const char* value) {
-    if (value) {
-      if (unescaped) {
-        m_buffer << value;
-      } else {
-        while (*value) {
-          escape_filter(m_buffer, *value);
-          ++value;
-        }
-      }
-    }
-    return *this;
-  }
-
-  recorder& recorder::operator<< (const flush&) {
-    core::instance().flush();
-    return *this;
-  }
-
-  recorder& recorder::endl () {
-    m_buffer << std::endl;
-    return *this;
-  }
-
-  recorder& recorder::raw () {
-    unescaped = true;
-    return *this;
-  }
-
-  recorder& recorder::escaped () {
-    unescaped = false;
-    return *this;
-  }
-
   // ---------------------------------------------------------------------------
   void rename_file_with_max_count (const std::string& name,
                                    int num,
@@ -435,7 +265,9 @@ namespace logging {
       try {
         logging::rename_file_with_max_count(name, i, maxnum);
       } catch (const std::exception& ex) {
-        LogError << "Exception in core::rename_file_with_max_count:" << ex.what();
+        std::ostringstream buf;
+        buf << "Exception in core::rename_file_with_max_count:" << ex.what();
+        instance().log(level::error, buf.str());
       }
     }
   }

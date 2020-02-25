@@ -10,10 +10,7 @@ set(LOGGING_BUILD_STATIC_MODULE_LIB ON CACHE BOOL "On to build a static library 
 
 if(NOT TARGET logging-obj)
 
-    add_subdirectory(../util util)
-
     set (logging_include
-        ${util_include}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_BINARY_DIR}
         ${PROJECT_BINARY_DIR}
@@ -24,19 +21,17 @@ if(NOT TARGET logging-obj)
     endif (APPLE)
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set (logging_sys_libraries stdc++fs pthread ${util_sys_libraries})
+        set (logging_sys_libraries stdc++fs pthread)
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set (logging_sys_libraries stdc++fs pthread ${util_sys_libraries})
-    else()
-          set (logging_sys_libraries ${util_sys_libraries})
+        set (logging_sys_libraries stdc++fs pthread)
     endif()
 
     if (LOGGING_BUILD_STATIC_MODULE_LIB)
-        set (logging_libraries logging-static ${util_libraries})
-        set (logging_defines "-DLOGGING_BUILT_AS_STATIC_LIB" ${util_defines})
+        set (logging_libraries logging-static)
+        set (logging_defines "-DLOGGING_BUILT_AS_STATIC_LIB" "-DUSE_LOGGING_LIB")
     else()
-        set (logging_libraries logging ${util_libraries})
-        set (logging_defines ${util_defines})
+        set (logging_libraries logging)
+        set (logging_defines "-DUSE_LOGGING_LIB")
     endif()
 
     set (logging_sys_libraries ${logging_sys_libraries} PARENT_SCOPE)

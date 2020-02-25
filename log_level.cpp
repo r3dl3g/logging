@@ -11,39 +11,35 @@
 *
 * Customer   -
 *
-* @brief     C++ API:log level
+* @brief     C++ API:logger
 *
 * @file
 */
-
-#pragma once
 
 // --------------------------------------------------------------------------
 //
 // Common includes
 //
-#include <iosfwd>
+#include <ostream>
 
 // --------------------------------------------------------------------------
 //
 // Library includes
 //
-#include <logging-export.h>
 
-/**
-* Provides an API for stream logging to multiple sinks.
-*/
+#include <logging/log_level.h>
+
+
 namespace logging {
 
-  /**
-  * logging levels. A level always includes subsequent levels.
-  */
-  enum class level {
-    undefined, trace, debug, info, warning, error, fatal
+  static const char* s_log_level_strings[] = {
+    "undef", "trace", "debug", "info ", "warn ", "error", "fatal"
   };
 
-  /// convenience stream operator to print log level to ostream.
-  LOGGING_EXPORT std::ostream& operator << (std::ostream& out, level const& lvl);
-
+  std::ostream& operator << (std::ostream& out, level const& lvl) {
+    out << s_log_level_strings[static_cast<int>(lvl)];
+    return out;
+  }
 
 } // namespace logging
+
