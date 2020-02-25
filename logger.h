@@ -24,28 +24,49 @@
 //
 #include <logging/recorder.h>
 
-#define NOT_LOGGING_ENABLE_TRACE
+namespace clog {
 
-/// Log macro trace
 #if defined(LOGGING_ENABLE_TRACE)
-# define log_trace logging::recorder (logging::level::trace)
+  struct trace : public logging::recorder {
+    inline trace ()
+      : logging::recorder(logging::level::trace)
+    {}
+  };
 #else
-# define log_trace logging::null_recoder ()
+  struct trace : public  logging::null_recoder {};
 #endif // LOGGING_ENABLE_TRACE
 
-/// Log macro debug
 #if defined(NDEBUG)
-# define log_debug logging::null_recoder ()
+  struct debug : public  logging::null_recoder {};
 #else
-# define log_debug logging::recorder (logging::level::debug)
+  struct debug : public logging::recorder {
+    inline debug ()
+      : logging::recorder(logging::level::debug)
+    {}
+  };
 #endif // NDEBUG
 
-/// Log macro info
-#define log_info  logging::recorder (logging::level::info)
-/// Log macro warning
-#define log_warn logging::recorder (logging::level::warning)
-/// Log macro error
-#define log_error logging::recorder (logging::level::error)
-/// Log macro fatal
-#define log_fatal logging::recorder (logging::level::fatal)
+  struct info : public logging::recorder {
+    inline info ()
+      : logging::recorder(logging::level::info)
+    {}
+  };
 
+  struct warn : public logging::recorder {
+    inline warn ()
+      : logging::recorder(logging::level::warning)
+    {}
+  };
+
+  struct error : public logging::recorder {
+    inline error ()
+      : logging::recorder(logging::level::error)
+    {}
+  };
+
+  struct fatal : public logging::recorder {
+    inline fatal ()
+      : logging::recorder(logging::level::fatal)
+    {}
+  };
+}
