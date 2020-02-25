@@ -28,24 +28,24 @@
 
 /// Log macro trace
 #if defined(LOGGING_ENABLE_TRACE)
-# define LogTrace logging::recorder (logging::level::trace)
+# define log_trace logging::recorder (logging::level::trace)
 #else
-# define LogTrace logging::null_recoder ()
+# define log_trace logging::null_recoder ()
 #endif // LOGGING_ENABLE_TRACE
 
 /// Log macro debug
 #if defined(NDEBUG)
-# define LogDebug logging::null_recoder ()
+# define log_debug logging::null_recoder ()
 #else
-# define LogDebug logging::recorder (logging::level::debug)
+# define log_debug logging::recorder (logging::level::debug)
 #endif // NDEBUG
 
 /// Log macro info
-#define LogInfo  logging::recorder (logging::level::info)
+#define log_info  logging::recorder (logging::level::info)
 /// Log macro warning
-#define LogWarng logging::recorder (logging::level::warning)
+#define log_warn logging::recorder (logging::level::warning)
 /// Log macro error
-#define LogError logging::recorder (logging::level::error)
+#define log_err logging::recorder (logging::level::error)
 /// Log macro fatal
-#define LogFatal logging::recorder (logging::level::fatal)
+#define log_fatal logging::recorder (logging::level::fatal)
 
