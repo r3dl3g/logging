@@ -2,12 +2,21 @@
 builddir=build/$(c++ --version | { read first rest ; echo $first ; })$(c++ -dumpversion)
 prjdir=$PWD
 
-mkdir -p $builddir/debug
-pushd $builddir/debug
-cmake "$prjdir" -G"Unix Makefiles" -DCMAKE_BUILD_TYPE="Debug"
-popd
+build () {
+  if [ "$2" == "On" ]; then
+    target=$1-static
+  else
+    target=$1-dynamic
+  fi
 
-mkdir -p $builddir/release
-pushd $builddir/release
-cmake "$prjdir" -G"Unix Makefiles" -DCMAKE_BUILD_TYPE="Release"
-popd
+  mkdir -p $builddir/$target
+  pushd $builddir/$target
+  cmake "$prjdir" -G"Unix Makefiles" -DCMAKE_BUILD_TYPE="$1" -DLOGGING_BUILD_STATIC_MODULE_LIB="$2"
+  make -j6
+  popd
+}
+
+build Debug On
+build Debug Off
+build Release On
+build Release Off

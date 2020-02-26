@@ -6,7 +6,7 @@ project("logging" CXX)
 
 include (GenerateExportHeader)
 
-set(LOGGING_BUILD_STATIC_MODULE_LIB ON CACHE BOOL "On to build a static library for each submodule, Off for shared library. default On")
+option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
 
 if(NOT TARGET logging-obj)
 
@@ -34,10 +34,13 @@ if(NOT TARGET logging-obj)
         set (logging_defines "-DUSE_LOGGING_LIB")
     endif()
 
-    set (logging_sys_libraries ${logging_sys_libraries} PARENT_SCOPE)
-    set (logging_include ${logging_include} PARENT_SCOPE)
-    set (logging_libraries ${logging_libraries} PARENT_SCOPE)
-    set (logging_defines ${logging_defines} PARENT_SCOPE)
+    get_directory_property(hasParent PARENT_DIRECTORY)
+    if (hasParent)
+      set (logging_sys_libraries ${logging_sys_libraries} PARENT_SCOPE)
+      set (logging_include ${logging_include} PARENT_SCOPE)
+      set (logging_libraries ${logging_libraries} PARENT_SCOPE)
+      set (logging_defines ${logging_defines} PARENT_SCOPE)
+    endif()
 
     message(STATUS "logging_defines: ${logging_defines}")
     message(STATUS "logging_libraries: ${logging_libraries}")
@@ -48,8 +51,8 @@ if(NOT TARGET logging-obj)
     set (LOGGING_VERSION_PATCH 1)
     set (LOGGING_VERSION "${LOGGING_VERSION_MAJOR}.${LOGGING_VERSION_MINOR}.${LOGGING_VERSION_PATCH}")
 
-    set (LOGGING_INCLUDE_INSTALL_DIR include/guipp/logging)
-    set (LOGGING_LIBRARY_INSTALL_DIR lib/guipp)
+    set (LOGGING_INCLUDE_INSTALL_DIR include/logging)
+    set (LOGGING_LIBRARY_INSTALL_DIR lib)
 
     include_directories(${logging_include})
 
@@ -59,12 +62,29 @@ if(NOT TARGET logging-obj)
         "${PROJECT_BINARY_DIR}/logging_version.h"
     )
 
-    file(GLOB SOURCE_FILES "*.h" "*.cpp" "*.inl")
-    file(GLOB INCLUDE_FILES "*.h" "*.inl")
+    set(SOURCE_FILES core.cpp
+                     log_level.cpp
+                     message_queue.cpp
+                     record.cpp
+                     recorder.cpp)
+    set(INCLUDE_FILES core.h
+                      core.inl
+                      dbgstream.h
+                      file_logger.h
+                      logger.h
+                      log_level.h
+                      message_queue.h
+                      recorder.h
+                      recorder.inl
+                      record.h
+                      record.inl
+                      redirect_stream.h)
 
     if (WIN32)
       add_definitions(-DWIN32_LEAN_AND_MEAN)
     endif (WIN32)
+
+    set(CMAKE_DEBUG_POSTFIX d)
 
     add_definitions(-DEXPERIMENTAL -Dlogging_obj_EXPORTS ${logging_defines})
 
