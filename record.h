@@ -66,10 +66,19 @@ namespace logging {
 
     record ();
 
+    /// Id of this logging entry
     const line_id& line () const;
+
+    /// time pint when this enty was created
     const std::chrono::system_clock::time_point& time_point () const;
+
+    /// level of this entry
     const logging::level& level () const;
+
+    /// name of the thread where this entry was created
     const std::string& thread_name () const;
+
+    /// mesage of this entry
     const std::string& message () const;
 
   private:
