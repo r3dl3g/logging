@@ -42,7 +42,7 @@
 namespace logging {
 
   /**
-    * Blocking (waiting) thread safe queue.
+    * Blocking (waiting) thread safe fifo queue.
     */
   struct LOGGING_EXPORT message_queue {
 

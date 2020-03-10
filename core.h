@@ -68,29 +68,46 @@ namespace logging {
     core ();
     ~core ();
 
+    /// start the logging core
     void start ();
+
+    /// finish the logging core
     void finish ();
+
+    /// flush cashed entries to the sinks
     void flush ();
 
+    /// add a log entry with current time point to the cache
     void log (level lvl, const std::string& message);
+
+    /// add a log entry with specific time point to the cache
     void log (level lvl, const std::chrono::system_clock::time_point& time_point, const std::string& message);
 
+    /// add a sink with a formatter
     void add_sink (std::ostream* stream, level lvl, const record_formatter& formatter);
+
+    /// remove a sink
     void remove_sink (std::ostream* stream);
+
+    /// remove all sinks
     void remove_all_sinks ();
 
+    /// get a standard formatter
     static record_formatter get_standard_formatter ();
+
+    /// get a simplified console formatter
     static record_formatter get_console_formatter ();
 
+    /// get the singleton core instance.
     static core& instance ();
 
+    /// helper to rename files with a number and a given maximum number
     static void rename_file_with_max_count (const std::string& name, int maxnum);
 
+    /// helper to build a temporary file name
     static std::string build_temp_log_file_name (const std::string& name);
 
-    /**
-      * Thread name. Thread specific variable to hold the name of the thread.
-      */
+    /// Thread name. Thread specific variable to hold the name of the thread.
     static void set_thread_name (const char* name);
 
   protected:

@@ -27,7 +27,8 @@
 namespace logging {
 
   /**
-  * log to a file
+  * log to a file.
+  * Automatic adds and remove itself to the logging core.
   */
   class file_logger {
   public:
