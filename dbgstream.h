@@ -35,6 +35,7 @@
 // Library includes
 //
 #include <logging/redirect_stream.h>
+#include <logging/core.h>
 
 
 /**
@@ -56,6 +57,17 @@ namespace logging {
     }
   };
 
-  typedef oredirect_stream<debug_log> odebugstream;
+  struct odebugstream : public oredirect_stream<debug_log> {
+
+    odebugstream (level lvl, const record_formatter& fmt) {
+      core::instance().add_sink(this, lvl, fmt);
+    }
+
+    ~odebugstream () {
+      core::instance().remove_sink(this);
+    }
+
+  };
+
 
 } // namespace logging
