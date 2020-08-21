@@ -92,7 +92,8 @@ if(NOT TARGET logging-obj)
 
     set_target_properties(logging-obj PROPERTIES
                           POSITION_INDEPENDENT_CODE ON
-                          FOLDER libraries)
+                          FOLDER libraries
+                          CXX_STANDARD 11)
 
     if(LOGGING_BUILD_STATIC_MODULE_LIB)
         add_library(logging-static STATIC $<TARGET_OBJECTS:logging-obj>)
