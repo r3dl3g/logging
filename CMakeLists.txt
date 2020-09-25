@@ -10,41 +10,41 @@ option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each su
 
 if(NOT TARGET logging-obj)
 
-    set (logging_include
+    set (LOGGING_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_BINARY_DIR}
         ${PROJECT_BINARY_DIR}
     )
 
     if (APPLE)
-      set (logging_include ${logging_include} /usr/local/include)
+      set (LOGGING_INCLUDE_DIRS ${LOGGING_INCLUDE_DIRS} /usr/local/include)
     endif (APPLE)
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set (logging_sys_libraries stdc++fs pthread)
+        set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set (logging_sys_libraries stdc++fs pthread)
+        set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
     endif()
 
     if (LOGGING_BUILD_STATIC_MODULE_LIB)
-        set (logging_libraries logging-static)
-        set (logging_defines "-DLOGGING_BUILT_AS_STATIC_LIB" "-DUSE_LOGGING_LIB")
+        set (LOGGING_LIBRARIES logging-static)
+        set (LOGGING_CXX_FLAGS "-DLOGGING_BUILT_AS_STATIC_LIB" "-DUSE_LOGGING_LIB")
     else()
-        set (logging_libraries logging)
-        set (logging_defines "-DUSE_LOGGING_LIB")
+        set (LOGGING_LIBRARIES logging)
+        set (LOGGING_CXX_FLAGS "-DUSE_LOGGING_LIB")
     endif()
 
     get_directory_property(hasParent PARENT_DIRECTORY)
     if (hasParent)
-      set (logging_sys_libraries ${logging_sys_libraries} PARENT_SCOPE)
-      set (logging_include ${logging_include} PARENT_SCOPE)
-      set (logging_libraries ${logging_libraries} PARENT_SCOPE)
-      set (logging_defines ${logging_defines} PARENT_SCOPE)
+      set (LOGGING_SYS_LIBRARIES ${LOGGING_SYS_LIBRARIES} PARENT_SCOPE)
+      set (LOGGING_INCLUDE_DIRS ${LOGGING_INCLUDE_DIRS} PARENT_SCOPE)
+      set (LOGGING_LIBRARIES ${LOGGING_LIBRARIES} PARENT_SCOPE)
+      set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} PARENT_SCOPE)
     endif()
 
-    message(STATUS "logging_defines: ${logging_defines}")
-    message(STATUS "logging_libraries: ${logging_libraries}")
-    message(STATUS "logging_sys_libraries: ${logging_sys_libraries}")
+    message(STATUS "LOGGING_CXX_FLAGS: ${LOGGING_CXX_FLAGS}")
+    message(STATUS "LOGGING_LIBRARIES: ${LOGGING_LIBRARIES}")
+    message(STATUS "LOGGING_SYS_LIBRARIES: ${LOGGING_SYS_LIBRARIES}")
 
     set (LOGGING_VERSION_MAJOR 1)
     set (LOGGING_VERSION_MINOR 0)
@@ -54,7 +54,7 @@ if(NOT TARGET logging-obj)
     set (LOGGING_INCLUDE_INSTALL_DIR include/logging)
     set (LOGGING_LIBRARY_INSTALL_DIR lib)
 
-    include_directories(${logging_include})
+    include_directories(${LOGGING_INCLUDE_DIRS})
 
     # header file to pass version settings to the source code
     configure_file (
@@ -86,7 +86,7 @@ if(NOT TARGET logging-obj)
 
     set(CMAKE_DEBUG_POSTFIX d)
 
-    add_definitions(-DEXPERIMENTAL -Dlogging_obj_EXPORTS ${logging_defines})
+    add_definitions(-DEXPERIMENTAL -Dlogging_obj_EXPORTS ${LOGGING_CXX_FLAGS})
 
     add_library(logging-obj OBJECT ${SOURCE_FILES})
 
@@ -101,7 +101,7 @@ if(NOT TARGET logging-obj)
     else()
         add_library(logging SHARED $<TARGET_OBJECTS:logging-obj>)
 
-        target_link_libraries(logging PRIVATE ${logging_sys_libraries})
+        target_link_libraries(logging PRIVATE ${LOGGING_SYS_LIBRARIES})
 
         set_target_properties(logging PROPERTIES
                               POSITION_INDEPENDENT_CODE ON
