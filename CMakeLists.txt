@@ -91,7 +91,7 @@ if(NOT TARGET logging-obj)
 
   add_definitions(-DEXPERIMENTAL -Dlogging_obj_EXPORTS ${LOGGING_CXX_FLAGS})
 
-  add_library(logging-obj OBJECT ${SOURCE_FILES})
+  add_library(logging-obj OBJECT ${SOURCE_FILES} ${INCLUDE_FILES})
 
   set_target_properties(logging-obj PROPERTIES
     POSITION_INDEPENDENT_CODE ON
