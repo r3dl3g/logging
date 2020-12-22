@@ -95,11 +95,11 @@ namespace logging {
     if (!m_is_active) {
       m_is_active = true;
       add_sink(&std::clog,
-         #ifdef NDEBUG
+#ifdef NDEBUG
                level::info
-         #else
+#else
                level::trace
-         #endif
+#endif
                , get_standard_formatter());
 
       m_sink_thread = std::thread(core::logging_sink_call, this);
@@ -108,7 +108,13 @@ namespace logging {
 
   void core::finish () {
     if (m_is_active) {
-      m_messages.wait_until_empty(std::chrono::milliseconds(500));
+      m_messages.wait_until_empty(std::chrono::milliseconds(
+#ifdef NDEBUG
+        500
+#else
+        2000
+#endif
+      ));
       m_is_active = false;
       m_messages.enqueue(record());
       m_sink_thread.join();
@@ -117,7 +123,13 @@ namespace logging {
 
   void core::flush () {
     if (m_is_active) {
-      m_messages.wait_until_empty(std::chrono::milliseconds(500));
+      m_messages.wait_until_empty(std::chrono::milliseconds(
+#ifdef NDEBUG
+        500
+#else
+        2000
+#endif
+      ));
     }
   }
 
