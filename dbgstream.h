@@ -25,8 +25,7 @@
 #include <sstream>
 #ifdef WIN32
 #include <windows.h>
-#endif // Win32
-#ifdef UNIX
+#else
 #include <iostream>
 #endif
 
