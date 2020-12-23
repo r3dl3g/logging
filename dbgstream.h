@@ -49,8 +49,7 @@ namespace logging {
     void operator ()(const std::string& t) {
 #ifdef WIN32
       ::OutputDebugString(t.c_str());
-#endif
-#ifdef UNIX
+#else
       std::cerr << t << std::endl;
 #endif // UNIX
     }
