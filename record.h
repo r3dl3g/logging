@@ -60,9 +60,9 @@ namespace logging {
   public:
     record (const std::chrono::system_clock::time_point& time_point,
             level lvl,
-            const std::string& thread_name,
-            const line_id& line,
-            const std::string& message);
+            std::string thread_name,
+            line_id&& line,
+            std::string&& message);
 
     record ();
 

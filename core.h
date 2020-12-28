@@ -78,10 +78,10 @@ namespace logging {
     void flush ();
 
     /// add a log entry with current time point to the cache
-    void log (level lvl, const std::string& message);
+    void log (level lvl, std::string&& message);
 
     /// add a log entry with specific time point to the cache
-    void log (level lvl, const std::chrono::system_clock::time_point& time_point, const std::string& message);
+    void log (level lvl, std::chrono::system_clock::time_point time_point, std::string&& message);
 
     /// add a sink with a formatter
     void add_sink (std::ostream* stream, level lvl, const record_formatter& formatter);
@@ -110,15 +110,18 @@ namespace logging {
     /// Thread name. Thread specific variable to hold the name of the thread.
     static void set_thread_name (const char* name);
 
+    core (const core&) = delete;
+    void operator= (const core&) = delete;
+
   protected:
     friend class record;
 
   private:
     static void logging_sink_call (core* core);
 
-    void log_to_sinks (const record& entry);
+    void log_to_sinks (record&& entry);
 
-    std::atomic_uint m_line_id;
+    std::atomic_uint m_line_id{};
     std::mutex m_mutex;
 
     typedef std::vector<sink> sink_list;
@@ -128,9 +131,6 @@ namespace logging {
 
     std::thread m_sink_thread;
     volatile bool m_is_active;
-
-    core (const core&) = delete;
-    void operator= (const core&) = delete;
   };
 
 } // namespace logging

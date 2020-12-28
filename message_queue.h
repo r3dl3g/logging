@@ -32,6 +32,7 @@
 //
 #include <logging/record.h>
 
+
 #ifdef WIN32
 #pragma warning (disable: 4251)
 #endif

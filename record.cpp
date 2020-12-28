@@ -22,6 +22,7 @@
 //
 #include <iomanip>
 #include <ostream>
+#include <utility>
 
 
 // --------------------------------------------------------------------------
@@ -47,14 +48,14 @@ namespace logging {
 
   record::record (const std::chrono::system_clock::time_point& time_point,
                   logging::level lvl,
-                  const std::string& thread_name,
-                  const line_id& line,
-                  const std::string& message)
+                  std::string thread_name,
+                  line_id&& line,
+                  std::string&& message)
     : m_time_point(time_point)
     , m_level(lvl)
-    , m_thread_name(thread_name)
+    , m_thread_name(std::move(thread_name))
     , m_line(line)
-    , m_message(message)
+    , m_message(std::move(message))
   {}
 
   record::record ()

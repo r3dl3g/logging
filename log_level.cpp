@@ -22,11 +22,11 @@
 //
 #include <ostream>
 
+
 // --------------------------------------------------------------------------
 //
 // Library includes
 //
-
 #include <logging/log_level.h>
 
 

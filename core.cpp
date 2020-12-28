@@ -22,7 +22,6 @@
 //
 #include <fstream>
 #include <iostream>
-#include <iomanip>
 #include <algorithm>
 #include <chrono>
 #include <thread>
@@ -75,15 +74,15 @@ namespace logging {
     while (core->m_is_active) {
       record entry = core->m_messages.dequeue();
       do {
-        core->log_to_sinks(entry);
+        core->log_to_sinks(std::move(entry));
       } while (core->m_messages.try_dequeue(entry));
     }
   }
 
   core::core ()
     : m_is_active(false)
+    , m_line_id(0)
   {
-    m_line_id = 0;
     start();
   }
 
@@ -146,15 +145,15 @@ namespace logging {
   }
 
   void core::log (level lvl,
-                  const std::string& message) {
-    log(lvl, std::chrono::system_clock::now(), message);
+                  std::string&& message) {
+    log(lvl, std::chrono::system_clock::now(), std::move(message));
   }
 
   void core::log (level lvl,
-                  const std::chrono::system_clock::time_point& time_point,
-                  const std::string& message) {
+                  std::chrono::system_clock::time_point time_point,
+                  std::string&& message) {
     unsigned int id = ++m_line_id;
-    record r(time_point, lvl, t_thread_name, id, message);
+    record r(time_point, lvl, t_thread_name, line_id(id), std::move(message));
     if (m_is_active) {
       m_messages.enqueue(std::move(r));
       if (lvl >= level::error) {
@@ -162,15 +161,14 @@ namespace logging {
         m_messages.wait_until_empty(std::chrono::milliseconds(1000));
       }
     } else {
-      log_to_sinks(r);
+      log_to_sinks(std::move(r));
     }
   }
 
-  void core::log_to_sinks (const record& entry) {
+  void core::log_to_sinks (record&& entry) {
     if (entry.level() != level::undefined) {
       std::lock_guard<std::mutex> lock(m_mutex);
-      for (sink_list::iterator i = m_sinks.begin(), e = m_sinks.end(); i != e; ++i) {
-        sink& s = *i;
+      for (auto& s : m_sinks) {
         if (entry.level() >= s.m_level) {
           try {
             s.m_formatter(*s.m_stream, entry);
@@ -192,7 +190,7 @@ namespace logging {
 
   void core::remove_sink (std::ostream* stream) {
     std::lock_guard<std::mutex> lock(m_mutex);
-    sink_list::iterator i = m_sinks.begin(), e = m_sinks.end();
+    auto i = m_sinks.begin(), e = m_sinks.end();
     i = std::find_if(i, e, [=](sink& s) { return s.m_stream == stream; });
     if (i != e) {
       m_sinks.erase(i);
@@ -243,7 +241,7 @@ namespace logging {
       std::string curr_name(name);
 
       if (num > 0) {
-        std::string numstr(".");
+        numstr = ".";
         numstr += std::to_string(num);
         if (point_pos > 0)
           curr_name.insert(point_pos, numstr);

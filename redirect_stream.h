@@ -46,7 +46,7 @@ namespace logging {
     typedef L target_type;
 
     template<typename... Args>
-    basic_redirect_buf (Args&&... args)
+    explicit basic_redirect_buf (Args&&... args)
       :m_target(args...)
     {}
 
@@ -75,7 +75,7 @@ namespace logging {
     typedef basic_redirect_buf<L, E, T> buffer_type;
 
     template<typename... Args>
-    basic_redirect_stream (Args&&... args)
+    explicit basic_redirect_stream (Args&&... args)
       : std::basic_ostream<E, T>(new buffer_type(args...))
     {}
 

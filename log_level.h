@@ -30,6 +30,7 @@
 //
 #include <logging-export.h>
 
+
 /**
 * Provides an API for stream logging to multiple sinks.
 */

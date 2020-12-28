@@ -43,9 +43,6 @@
 namespace logging {
 
   struct debug_log {
-    debug_log ()
-    {}
-
     void operator ()(const std::string& t) {
 #ifdef WIN32
       ::OutputDebugString(t.c_str());
@@ -61,7 +58,7 @@ namespace logging {
       core::instance().add_sink(this, lvl, fmt);
     }
 
-    ~odebugstream () {
+    ~odebugstream () override {
       core::instance().remove_sink(this);
     }
 
