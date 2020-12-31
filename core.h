@@ -26,6 +26,9 @@
 #include <atomic>
 #include <functional>
 #include <thread>
+#ifdef USE_MINGW
+#include <mingw/mingw.thread.h>
+#endif
 
 // --------------------------------------------------------------------------
 //

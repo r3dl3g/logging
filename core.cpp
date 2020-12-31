@@ -64,7 +64,7 @@ namespace logging {
 
 namespace logging {
 
-#if (defined WIN32 || defined _WIN32 || defined WINCE || defined __CYGWIN__) && !defined(thread_local)
+#if (defined WIN32 || defined _WIN32 || defined WINCE || defined __CYGWIN__) && !defined(thread_local) && !defined(USE_MINGW)
 # define thread_local __declspec(thread)
 #endif
 

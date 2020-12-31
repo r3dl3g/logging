@@ -35,6 +35,10 @@ if(NOT TARGET logging-obj)
     set (LOGGING_CXX_FLAGS "-DUSE_LOGGING_LIB")
   endif()
 
+  if(CMAKE_CXX_PLATFORM_ID STREQUAL "MinGW")
+    set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} "-DUSE_MINGW")
+  endif()
+
   get_directory_property(hasParent PARENT_DIRECTORY)
   if (hasParent)
     set (LOGGING_SYS_LIBRARIES ${LOGGING_SYS_LIBRARIES} PARENT_SCOPE)
