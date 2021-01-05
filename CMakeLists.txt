@@ -31,7 +31,7 @@ if(NOT TARGET logging)
   endif (APPLE)
 
   if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
+    set (LOGGING_SYS_LIBRARIES pthread)
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
   endif()
