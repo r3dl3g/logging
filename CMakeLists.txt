@@ -6,9 +6,17 @@ project("logging" CXX)
 
 include (GenerateExportHeader)
 
+cmake_policy(SET CMP0077 NEW)
+
 option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
 option(LOGGING_STANDALONE_BUILD "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
 option(LOGGING_CXX_STANDARD "C++ standard to overwrite default cmake standard" ${CMAKE_CXX_STANDARD})
+
+function(DebugPrint MSG)
+  if(VERBOSE)
+    message(STATUS "${MSG}")
+  endif()
+endfunction(DebugPrint)
 
 if(NOT TARGET logging)
 
@@ -28,18 +36,19 @@ if(NOT TARGET logging)
     set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
   endif()
 
+  set (LOGGING_LIBRARIES logging)
+  set (LOGGING_CXX_FLAGS "-DUSE_LOGGING_LIB")
+
   if (LOGGING_BUILD_STATIC_MODULE_LIB)
+    set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} "-DLOGGING_BUILT_AS_STATIC_LIB")
     set (LOGGING_LINK STATIC)
-    set (LOGGING_CXX_FLAGS "-DLOGGING_BUILT_AS_STATIC_LIB" "-DUSE_LOGGING_LIB")
   else()
     set (LOGGING_LINK SHARED)
-    set (LOGGING_CXX_FLAGS "-DUSE_LOGGING_LIB")
   endif()
-
-  set (LOGGING_LIBRARIES logging)
 
   if(CMAKE_CXX_PLATFORM_ID STREQUAL "MinGW")
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} "-DUSE_MINGW")
+    set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
   endif()
 
   if (LOGGING_CXX_STANDARD STREQUAL "OFF")
@@ -57,10 +66,10 @@ if(NOT TARGET logging)
     SET (LOGGING_STANDALONE_BUILD On)
   endif()
 
-  message(STATUS "LOGGING_CXX_FLAGS: ${LOGGING_CXX_FLAGS}")
-  message(STATUS "LOGGING_LIBRARIES: ${LOGGING_LIBRARIES}")
-  message(STATUS "LOGGING_SYS_LIBRARIES: ${LOGGING_SYS_LIBRARIES}")
-  message(STATUS "LOGGING_CXX_STANDARD: ${LOGGING_CXX_STANDARD}")
+  DebugPrint("LOGGING_CXX_FLAGS: ${LOGGING_CXX_FLAGS}")
+  DebugPrint("LOGGING_LIBRARIES: ${LOGGING_LIBRARIES}")
+  DebugPrint("LOGGING_SYS_LIBRARIES: ${LOGGING_SYS_LIBRARIES}")
+  DebugPrint("LOGGING_CXX_STANDARD: ${LOGGING_CXX_STANDARD}")
 
   set (LOGGING_VERSION_MAJOR 1)
   set (LOGGING_VERSION_MINOR 0)
@@ -111,14 +120,16 @@ if(NOT TARGET logging)
     FOLDER libraries
     CXX_STANDARD ${LOGGING_CXX_STANDARD})
 
-  if(!LOGGING_BUILD_STATIC_MODULE_LIB)
+  if(LOGGING_BUILD_STATIC_MODULE_LIB)
+    DebugPrint("LOGGING: Create static Library")
+  else()
+    DebugPrint("LOGGING: Create shared Library")
 
     target_link_libraries(logging PRIVATE ${LOGGING_SYS_LIBRARIES})
 
     set_target_properties(logging PROPERTIES
       VERSION ${LOGGING_VERSION}
       SOVERSION ${LOGGING_VERSION_MAJOR})
-
   endif()
 
   if (LOGGING_STANDALONE_BUILD)
