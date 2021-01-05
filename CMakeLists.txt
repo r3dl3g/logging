@@ -10,7 +10,7 @@ option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each su
 option(LOGGING_STANDALONE_BUILD "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
 option(LOGGING_CXX_STANDARD "C++ standard to overwrite default cmake standard" ${CMAKE_CXX_STANDARD})
 
-if(NOT TARGET logging-obj)
+if(NOT TARGET logging)
 
   set (LOGGING_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -29,12 +29,14 @@ if(NOT TARGET logging-obj)
   endif()
 
   if (LOGGING_BUILD_STATIC_MODULE_LIB)
-    set (LOGGING_LIBRARIES logging-static)
+    set (LOGGING_LINK STATIC)
     set (LOGGING_CXX_FLAGS "-DLOGGING_BUILT_AS_STATIC_LIB" "-DUSE_LOGGING_LIB")
   else()
-    set (LOGGING_LIBRARIES logging)
+    set (LOGGING_LINK SHARED)
     set (LOGGING_CXX_FLAGS "-DUSE_LOGGING_LIB")
   endif()
+
+  set (LOGGING_LIBRARIES logging)
 
   if(CMAKE_CXX_PLATFORM_ID STREQUAL "MinGW")
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} "-DUSE_MINGW")
@@ -100,36 +102,30 @@ if(NOT TARGET logging-obj)
 
   set(CMAKE_DEBUG_POSTFIX d)
 
-  add_definitions(-DEXPERIMENTAL -Dlogging_obj_EXPORTS ${LOGGING_CXX_FLAGS})
+  add_definitions(-Dlogging_EXPORTS ${LOGGING_CXX_FLAGS})
 
-  add_library(logging-obj OBJECT ${SOURCE_FILES} ${INCLUDE_FILES})
+  add_library(logging ${LOGGING_LINK} ${SOURCE_FILES} ${INCLUDE_FILES})
 
-  set_target_properties(logging-obj PROPERTIES
+  set_target_properties(logging PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     FOLDER libraries
     CXX_STANDARD ${LOGGING_CXX_STANDARD})
 
-  if(LOGGING_BUILD_STATIC_MODULE_LIB)
-    add_library(logging-static STATIC $<TARGET_OBJECTS:logging-obj>)
-    if (LOGGING_STANDALONE_BUILD)
-      install(TARGETS logging-static DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
-    endif()
-  else()
-    add_library(logging SHARED $<TARGET_OBJECTS:logging-obj>)
+  if(!LOGGING_BUILD_STATIC_MODULE_LIB)
 
     target_link_libraries(logging PRIVATE ${LOGGING_SYS_LIBRARIES})
 
     set_target_properties(logging PROPERTIES
-      POSITION_INDEPENDENT_CODE ON
-      FOLDER libraries
       VERSION ${LOGGING_VERSION}
       SOVERSION ${LOGGING_VERSION_MAJOR})
-    if (LOGGING_STANDALONE_BUILD)
-      install(TARGETS logging DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
-    endif()
+
   endif()
 
-  GENERATE_EXPORT_HEADER(logging-obj
+  if (LOGGING_STANDALONE_BUILD)
+    install(TARGETS logging DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
+  endif()
+
+  GENERATE_EXPORT_HEADER(logging
     BASE_NAME LOGGING
     EXPORT_MACRO_NAME LOGGING_EXPORT
     EXPORT_FILE_NAME logging-export.h
