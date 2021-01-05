@@ -124,16 +124,16 @@ namespace logging {
 
     void log_to_sinks (record&& entry);
 
+    volatile bool m_is_active;
     std::atomic_uint m_line_id{};
-    std::mutex m_mutex;
 
+    std::mutex m_mutex;
     typedef std::vector<sink> sink_list;
+
     sink_list m_sinks;
 
     message_queue m_messages;
-
     std::thread m_sink_thread;
-    volatile bool m_is_active;
   };
 
 } // namespace logging

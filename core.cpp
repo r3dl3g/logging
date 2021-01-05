@@ -27,18 +27,52 @@
 #include <thread>
 
 
-#if ((_MSC_VER >= 1900) && defined(EXPERIMENTAL)) || (__GNUC__ > 5) || ((__GNUC__ == 5) && (__GNUC_MINOR__ >3)) || ((__clang__) && !__APPLE__)
-# include <experimental/filesystem>
-  using namespace std::experimental;
+
+// Use c++ feature checking
+#if defined __has_include
+
+# if __has_include(<filesystem>)
+#  define has_filesystem 1
+# elif __has_include(<experimental/filesystem>)
+#  define has_experimental_filesystem 1
+# endif
+
+// fallback to simple version checking
+#elif (__cplusplus >= 201703L)
+
+# define has_filesystem 1
+
+#elif (_MSC_VER >= 1900) || (__GNUC__ > 5) || ((__GNUC__ == 5) && (__GNUC_MINOR__ > 3))
+
+#  define has_experimental_filesystem 1
+
+#endif
+
+
+#if defined has_filesystem
+
 # define USE_STD_FS
-#elif !defined(NO_BOOST)
-# define USE_BOOST
+# include <filesystem>
+namespace sys_fs = std::filesystem;
+
+#elif defined has_experimental_filesystem
+
+# define USE_STD_FS
+# include <experimental/filesystem>
+namespace sys_fs = std::experimental::filesystem;
+
+#elif defined USE_BOOST
+
+# define USE_STD_FS
+
 # include <boost/exception/diagnostic_information.hpp>
 # include <boost/filesystem.hpp>
-  using namespace boost;
-# define USE_STD_FS
+namespace sys_fs = boost::filesystem;
+
 #else
+
 # include <unistd.h>
+
 #endif
 
 // --------------------------------------------------------------------------
@@ -227,9 +261,9 @@ namespace logging {
     }
 
 #ifdef USE_STD_FS
-    filesystem::path next_path(next_name);
-    if (filesystem::exists(next_path)) {
-      filesystem::remove(next_path);
+    sys_fs::path next_path(next_name);
+    if (sys_fs::exists(next_path)) {
+      sys_fs::remove(next_path);
     }
 #else
     if (access(next_name.c_str(), F_OK) != -1) {
@@ -251,12 +285,12 @@ namespace logging {
 
 #ifdef USE_STD_FS
       if (next_path.has_parent_path()) {
-        filesystem::create_directories(next_path.parent_path());
+        sys_fs::create_directories(next_path.parent_path());
       }
 
-      filesystem::path curr_path(curr_name);
-      if (filesystem::exists(curr_path)) {
-        filesystem::rename(curr_path, next_path);
+      sys_fs::path curr_path(curr_name);
+      if (sys_fs::exists(curr_path)) {
+        sys_fs::rename(curr_path, next_path);
       }
 #else
       if (access(curr_name.c_str(), F_OK) != -1) {
@@ -284,7 +318,7 @@ namespace logging {
   // ---------------------------------------------------------------------------
   std::string core::build_temp_log_file_name (const std::string& name) {
 #ifdef USE_STD_FS
-    filesystem::path tmp = filesystem::temp_directory_path();
+    sys_fs::path tmp = sys_fs::temp_directory_path();
     tmp /= name;
     return tmp.string();
 #else

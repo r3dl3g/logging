@@ -8,6 +8,7 @@ include (GenerateExportHeader)
 
 option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
 option(LOGGING_STANDALONE_BUILD "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
+option(LOGGING_CXX_STANDARD "C++ standard to overwrite default cmake standard" ${CMAKE_CXX_STANDARD})
 
 if(NOT TARGET logging-obj)
 
@@ -39,12 +40,17 @@ if(NOT TARGET logging-obj)
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} "-DUSE_MINGW")
   endif()
 
+  if (LOGGING_CXX_STANDARD STREQUAL "OFF")
+    set (LOGGING_CXX_STANDARD 17)
+  endif ()
+
   get_directory_property(hasParent PARENT_DIRECTORY)
   if (hasParent)
     set (LOGGING_SYS_LIBRARIES ${LOGGING_SYS_LIBRARIES} PARENT_SCOPE)
     set (LOGGING_INCLUDE_DIRS ${LOGGING_INCLUDE_DIRS} PARENT_SCOPE)
     set (LOGGING_LIBRARIES ${LOGGING_LIBRARIES} PARENT_SCOPE)
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} PARENT_SCOPE)
+    set (LOGGING_CXX_STANDARD ${LOGGING_CXX_STANDARD} PARENT_SCOPE)
   else()
     SET (LOGGING_STANDALONE_BUILD On)
   endif()
@@ -52,6 +58,7 @@ if(NOT TARGET logging-obj)
   message(STATUS "LOGGING_CXX_FLAGS: ${LOGGING_CXX_FLAGS}")
   message(STATUS "LOGGING_LIBRARIES: ${LOGGING_LIBRARIES}")
   message(STATUS "LOGGING_SYS_LIBRARIES: ${LOGGING_SYS_LIBRARIES}")
+  message(STATUS "LOGGING_CXX_STANDARD: ${LOGGING_CXX_STANDARD}")
 
   set (LOGGING_VERSION_MAJOR 1)
   set (LOGGING_VERSION_MINOR 0)
@@ -100,7 +107,7 @@ if(NOT TARGET logging-obj)
   set_target_properties(logging-obj PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     FOLDER libraries
-    CXX_STANDARD 11)
+    CXX_STANDARD ${LOGGING_CXX_STANDARD})
 
   if(LOGGING_BUILD_STATIC_MODULE_LIB)
     add_library(logging-static STATIC $<TARGET_OBJECTS:logging-obj>)
