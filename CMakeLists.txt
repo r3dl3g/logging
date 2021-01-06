@@ -6,7 +6,9 @@ project("logging" CXX)
 
 include (GenerateExportHeader)
 
-cmake_policy(SET CMP0077 NEW)
+if(POLICY CMP0077)
+  cmake_policy(SET CMP0077 NEW)
+endif()
 
 option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
 option(LOGGING_STANDALONE_BUILD "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
@@ -20,6 +22,17 @@ endfunction(DebugPrint)
 
 if(NOT TARGET logging)
 
+  set (LOGGING_VERSION_MAJOR 1)
+  set (LOGGING_VERSION_MINOR 0)
+  set (LOGGING_VERSION_PATCH 1)
+  set (LOGGING_VERSION "${LOGGING_VERSION_MAJOR}.${LOGGING_VERSION_MINOR}.${LOGGING_VERSION_PATCH}")
+
+  set (LOGGING_LIBRARIES logging)
+
+  if (LOGGING_CXX_STANDARD STREQUAL "OFF")
+    set (LOGGING_CXX_STANDARD 17)
+  endif ()
+
   set (LOGGING_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -27,17 +40,17 @@ if(NOT TARGET logging)
     )
 
   if (APPLE)
-    set (LOGGING_INCLUDE_DIRS ${LOGGING_INCLUDE_DIRS} /usr/local/include)
-  endif (APPLE)
-
-  if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set (LOGGING_SYS_LIBRARIES pthread)
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set (LOGGING_INCLUDE_DIRS ${LOGGING_INCLUDE_DIRS} /usr/local/include)
+  elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
-  endif()
+  endif ()
 
-  set (LOGGING_LIBRARIES logging)
   set (LOGGING_CXX_FLAGS "-DUSE_LOGGING_LIB")
+
+  if (WIN32)
+    set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} "-DWIN32_LEAN_AND_MEAN")
+  endif (WIN32)
 
   if (LOGGING_BUILD_STATIC_MODULE_LIB)
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} "-DLOGGING_BUILT_AS_STATIC_LIB")
@@ -50,10 +63,6 @@ if(NOT TARGET logging)
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} "-DUSE_MINGW")
     set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
   endif()
-
-  if (LOGGING_CXX_STANDARD STREQUAL "OFF")
-    set (LOGGING_CXX_STANDARD 17)
-  endif ()
 
   get_directory_property(hasParent PARENT_DIRECTORY)
   if (hasParent)
@@ -71,27 +80,20 @@ if(NOT TARGET logging)
   DebugPrint("LOGGING_SYS_LIBRARIES: ${LOGGING_SYS_LIBRARIES}")
   DebugPrint("LOGGING_CXX_STANDARD: ${LOGGING_CXX_STANDARD}")
 
-  set (LOGGING_VERSION_MAJOR 1)
-  set (LOGGING_VERSION_MINOR 0)
-  set (LOGGING_VERSION_PATCH 1)
-  set (LOGGING_VERSION "${LOGGING_VERSION_MAJOR}.${LOGGING_VERSION_MINOR}.${LOGGING_VERSION_PATCH}")
-
-  set (LOGGING_INCLUDE_INSTALL_DIR include/logging)
-  set (LOGGING_LIBRARY_INSTALL_DIR lib)
-
   include_directories(${LOGGING_INCLUDE_DIRS})
 
   # header file to pass version settings to the source code
   configure_file (
     "${PROJECT_SOURCE_DIR}/version.h.in"
     "${PROJECT_BINARY_DIR}/logging_version.h"
-    )
+  )
 
   set(SOURCE_FILES core.cpp
     log_level.cpp
     message_queue.cpp
     record.cpp
-    recorder.cpp)
+    recorder.cpp
+  )
   set(INCLUDE_FILES core.h
     core.inl
     dbgstream.h
@@ -103,11 +105,8 @@ if(NOT TARGET logging)
     recorder.inl
     record.h
     record.inl
-    redirect_stream.h)
-
-  if (WIN32)
-    add_definitions(-DWIN32_LEAN_AND_MEAN)
-  endif (WIN32)
+    redirect_stream.h
+  )
 
   set(CMAKE_DEBUG_POSTFIX d)
 
@@ -118,7 +117,10 @@ if(NOT TARGET logging)
   set_target_properties(logging PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     FOLDER libraries
-    CXX_STANDARD ${LOGGING_CXX_STANDARD})
+    VERSION ${LOGGING_VERSION}
+    SOVERSION ${LOGGING_VERSION_MAJOR}
+    CXX_STANDARD ${LOGGING_CXX_STANDARD}
+  )
 
   if(LOGGING_BUILD_STATIC_MODULE_LIB)
     DebugPrint("LOGGING: Create static Library")
@@ -126,14 +128,6 @@ if(NOT TARGET logging)
     DebugPrint("LOGGING: Create shared Library")
 
     target_link_libraries(logging PRIVATE ${LOGGING_SYS_LIBRARIES})
-
-    set_target_properties(logging PROPERTIES
-      VERSION ${LOGGING_VERSION}
-      SOVERSION ${LOGGING_VERSION_MAJOR})
-  endif()
-
-  if (LOGGING_STANDALONE_BUILD)
-    install(TARGETS logging DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
   endif()
 
   GENERATE_EXPORT_HEADER(logging
@@ -141,9 +135,13 @@ if(NOT TARGET logging)
     EXPORT_MACRO_NAME LOGGING_EXPORT
     EXPORT_FILE_NAME logging-export.h
     STATIC_DEFINE LOGGING_BUILT_AS_STATIC_LIB
-    )
+  )
+
+  set (LOGGING_INCLUDE_INSTALL_DIR include/logging)
+  set (LOGGING_LIBRARY_INSTALL_DIR lib)
 
   if (LOGGING_STANDALONE_BUILD)
+    install(TARGETS logging DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
     install(FILES ${INCLUDE_FILES}
       ${PROJECT_BINARY_DIR}/logging-export.h
       ${PROJECT_BINARY_DIR}/logging_version.h
