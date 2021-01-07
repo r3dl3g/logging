@@ -42,7 +42,8 @@ if(NOT TARGET logging)
   if (APPLE)
     set (LOGGING_SYS_LIBRARIES pthread)
     set (LOGGING_INCLUDE_DIRS ${LOGGING_INCLUDE_DIRS} /usr/local/include)
-  elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR 
+          ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND NOT (CMAKE_CXX_PLATFORM_ID STREQUAL "Windows")))
     set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
   endif ()
 

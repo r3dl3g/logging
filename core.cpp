@@ -31,10 +31,10 @@
 // Use c++ feature checking
 #if defined __has_include
 
-# if __has_include(<filesystem>)
-#  define has_filesystem 1
-# elif __has_include(<experimental/filesystem>)
+# if __has_include(<experimental/filesystem>)
 #  define has_experimental_filesystem 1
+# elif __has_include(<filesystem>)
+#  define has_filesystem 1
 # endif
 
 // fallback to simple version checking
