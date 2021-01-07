@@ -53,7 +53,12 @@
 
 # define USE_STD_FS
 # include <filesystem>
+
+# if WIN32 && __clang__
+namespace sys_fs = std::experimental::filesystem;
+# else
 namespace sys_fs = std::filesystem;
+# endif
 
 #elif defined has_experimental_filesystem
 
