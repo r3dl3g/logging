@@ -28,6 +28,12 @@
 
 
 
+#ifdef ANDROID
+
+# include <unistd.h>
+
+#else
+
 // Use c++ feature checking
 #if defined __has_include
 
@@ -77,6 +83,8 @@ namespace sys_fs = boost::filesystem;
 #else
 
 # include <unistd.h>
+
+#endif
 
 #endif
 
