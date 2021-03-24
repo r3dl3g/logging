@@ -112,7 +112,9 @@ if(NOT TARGET logging)
     redirect_stream.h
   )
 
-  set(CMAKE_DEBUG_POSTFIX d)
+  if (NOT ANDROID)
+    set(CMAKE_DEBUG_POSTFIX d)
+  endif ()
 
   add_definitions(-Dlogging_EXPORTS ${LOGGING_CXX_FLAGS})
 
