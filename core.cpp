@@ -185,6 +185,12 @@ namespace logging {
     };
   }
 
+  record_formatter core::get_no_time_formatter () {
+    return [](std::ostream& out, const record& e) {
+      out << e.level() << '|' << e.thread_name() << '|' << e.message() << std::endl;
+    };
+  }
+
   record_formatter core::get_console_formatter () {
     return [](std::ostream& out, const record& e) {
       out << e.message() << std::endl;

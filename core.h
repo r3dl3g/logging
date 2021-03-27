@@ -98,6 +98,9 @@ namespace logging {
     /// get a standard formatter
     static record_formatter get_standard_formatter ();
 
+    /// get a standard formatter without time point prefix
+    static record_formatter get_no_time_formatter ();
+
     /// get a simplified console formatter
     static record_formatter get_console_formatter ();
 
