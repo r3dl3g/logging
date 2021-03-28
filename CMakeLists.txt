@@ -5,6 +5,8 @@ project("logging" CXX)
 # see: http://stackoverflow.com/questions/23684789/cmake-build-multiple-executables-in-one-project-with-static-library
 
 include (GenerateExportHeader)
+include (CMakePackageConfigHelpers)
+include (GNUInstallDirs)
 
 if(POLICY CMP0077)
   cmake_policy(SET CMP0077 NEW)
@@ -143,15 +145,39 @@ if(NOT TARGET logging)
     STATIC_DEFINE LOGGING_BUILT_AS_STATIC_LIB
   )
 
-  set (LOGGING_INCLUDE_INSTALL_DIR include/logging)
-  set (LOGGING_LIBRARY_INSTALL_DIR lib)
-
   if (LOGGING_STANDALONE_BUILD)
-    install(TARGETS logging DESTINATION ${LOGGING_LIBRARY_INSTALL_DIR})
+    set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/logging)
+    set (LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/logging)
+
+    target_include_directories(logging
+                               PUBLIC
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+                               "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
+    )
+
+    write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/loggingConfigVersion.cmake
+                                     VERSION ${LOGGING_VERSION}
+                                     COMPATIBILITY SameMajorVersion)
+
+    install(TARGETS logging
+            EXPORT loggingTargets
+            LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR}
+            ARCHIVE DESTINATION ${LIBRARY_INSTALL_DIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            INCLUDES DESTINATION ${INCLUDE_INSTALL_DIR}
+    )
+
     install(FILES ${INCLUDE_FILES}
       ${PROJECT_BINARY_DIR}/logging-export.h
       ${PROJECT_BINARY_DIR}/logging_version.h
-      DESTINATION ${LOGGING_INCLUDE_INSTALL_DIR})
+      DESTINATION ${INCLUDE_INSTALL_DIR})
+
+    install(EXPORT loggingTargets
+            FILE loggingTargets.cmake
+            NAMESPACE logging::
+            DESTINATION ${LIBRARY_INSTALL_DIR}/cmake
+    )
+
   endif()
 
 endif()
