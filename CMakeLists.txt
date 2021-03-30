@@ -159,6 +159,10 @@ if(NOT TARGET logging)
                                      VERSION ${LOGGING_VERSION}
                                      COMPATIBILITY SameMajorVersion)
 
+    configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+                                  "${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake"
+                                  INSTALL_DESTINATION ${LIBRARY_INSTALL_DIR})
+
     install(TARGETS logging
             EXPORT loggingTargets
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -177,6 +181,13 @@ if(NOT TARGET logging)
             NAMESPACE logging::
             DESTINATION ${LIBRARY_INSTALL_DIR}
     )
+
+    export(TARGETS logging FILE loggingTargets.cmake)
+
+    install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/loggingConfigVersion.cmake"
+            DESTINATION ${LIBRARY_INSTALL_DIR})
 
   endif()
 
