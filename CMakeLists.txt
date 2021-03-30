@@ -13,7 +13,7 @@ if(POLICY CMP0077)
 endif()
 
 option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
-option(LOGGING_STANDALONE_BUILD "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
+option(LOGGING_CONFIG_INSTALL "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
 option(LOGGING_CXX_STANDARD "C++ standard to overwrite default cmake standard" ${CMAKE_CXX_STANDARD})
 
 function(DebugPrint MSG)
@@ -78,7 +78,7 @@ if(NOT TARGET logging)
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} PARENT_SCOPE)
     set (LOGGING_CXX_STANDARD ${LOGGING_CXX_STANDARD} PARENT_SCOPE)
   else()
-    SET (LOGGING_STANDALONE_BUILD On)
+    SET (LOGGING_CONFIG_INSTALL On)
   endif()
 
   DebugPrint("LOGGING_CXX_FLAGS: ${LOGGING_CXX_FLAGS}")
@@ -145,9 +145,9 @@ if(NOT TARGET logging)
     STATIC_DEFINE LOGGING_BUILT_AS_STATIC_LIB
   )
 
-  if (LOGGING_STANDALONE_BUILD)
+  if (LOGGING_CONFIG_INSTALL)
     set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/logging)
-    set (LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/logging)
+    set (LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/logging)
 
     target_include_directories(logging
                                PUBLIC
@@ -161,8 +161,8 @@ if(NOT TARGET logging)
 
     install(TARGETS logging
             EXPORT loggingTargets
-            LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR}
-            ARCHIVE DESTINATION ${LIBRARY_INSTALL_DIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             INCLUDES DESTINATION ${INCLUDE_INSTALL_DIR}
     )
@@ -175,7 +175,7 @@ if(NOT TARGET logging)
     install(EXPORT loggingTargets
             FILE loggingTargets.cmake
             NAMESPACE logging::
-            DESTINATION ${LIBRARY_INSTALL_DIR}/cmake
+            DESTINATION ${LIBRARY_INSTALL_DIR}
     )
 
   endif()
