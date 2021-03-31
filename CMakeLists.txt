@@ -29,7 +29,7 @@ if(NOT TARGET logging)
   set (LOGGING_VERSION_PATCH 1)
   set (LOGGING_VERSION "${LOGGING_VERSION_MAJOR}.${LOGGING_VERSION_MINOR}.${LOGGING_VERSION_PATCH}")
 
-  set (LOGGING_LIBRARIES logging)
+  set (LOGGING_LIBRARIES logging::logging)
 
   if (LOGGING_CXX_STANDARD STREQUAL "OFF")
     set (LOGGING_CXX_STANDARD 17)
@@ -37,7 +37,7 @@ if(NOT TARGET logging)
 
   set (LOGGING_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/..
     ${PROJECT_BINARY_DIR}
     )
 
@@ -121,6 +121,7 @@ if(NOT TARGET logging)
   add_definitions(-Dlogging_EXPORTS ${LOGGING_CXX_FLAGS})
 
   add_library(logging ${LOGGING_LINK} ${SOURCE_FILES} ${INCLUDE_FILES})
+  add_library(logging::logging ALIAS logging)
 
   set_target_properties(logging PROPERTIES
     POSITION_INDEPENDENT_CODE ON
