@@ -24,49 +24,50 @@
 //
 #include <logging/recorder.h>
 
-namespace clog {
+namespace logging {
 
 #if defined(LOGGING_ENABLE_TRACE)
-  struct trace : public logging::recorder {
+  struct trace : public recorder {
     inline trace ()
-      : logging::recorder(logging::level::trace)
+      : recorder(level::trace)
     {}
   };
 #else
-  struct trace : public  logging::null_recoder {};
+  struct trace : public  null_recoder {};
 #endif // LOGGING_ENABLE_TRACE
 
 #if defined(NDEBUG)
-  struct debug : public  logging::null_recoder {};
+  struct debug : public  null_recoder {};
 #else
-  struct debug : public logging::recorder {
+  struct debug : public recorder {
     inline debug ()
-      : logging::recorder(logging::level::debug)
+      : recorder(level::debug)
     {}
   };
 #endif // NDEBUG
 
-  struct info : public logging::recorder {
+  struct info : public recorder {
     inline info ()
-      : logging::recorder(logging::level::info)
+      : recorder(level::info)
     {}
   };
 
-  struct warn : public logging::recorder {
+  struct warn : public recorder {
     inline warn ()
-      : logging::recorder(logging::level::warning)
+      : recorder(level::warning)
     {}
   };
 
-  struct error : public logging::recorder {
+  struct error : public recorder {
     inline error ()
-      : logging::recorder(logging::level::error)
+      : recorder(level::error)
     {}
   };
 
-  struct fatal : public logging::recorder {
+  struct fatal : public recorder {
     inline fatal ()
-      : logging::recorder(logging::level::fatal)
+      : recorder(level::fatal)
     {}
   };
-}
+
+} // namespace logging
