@@ -25,7 +25,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <queue>
-#ifdef USE_MINGW
+#if defined USE_MINGW && __MINGW_GCC_VERSION < 100000
 #include <mingw/mingw.condition_variable.h>
 #include <mingw/mingw.mutex.h>
 #endif
