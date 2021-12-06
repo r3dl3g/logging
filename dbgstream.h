@@ -7,13 +7,11 @@
 *
 * @author    <a href="mailto:armin@rothfuss-web.de">Armin Rothfuss</a>
 *
-* Project    standard lib
+* Project    logging lib
 *
-* Customer   -
+* @brief     C++ logger
 *
-* @brief     C++ API:dbgstream
-*
-* @file
+* @license   MIT license. See accompanying file LICENSE.
 */
 
 #pragma once

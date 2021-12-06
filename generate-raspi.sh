@@ -5,7 +5,7 @@ export PATH=/opt/raspberrypi/cross-pi-gcc/bin:/opt/raspberrypi/cross-pi-gcc/libe
 export RASPBERRY_VERSION=1
 export CXX=arm-linux-gnueabihf-c++
 
-builddir=build/$($CXX -dumpversion)-$($CXX -dumpmachine)
+builddir=~/Projekte/build/ibr/logging/$($CXX -dumpversion)-$($CXX -dumpmachine)
 prjdir=$PWD
 
 build () {
