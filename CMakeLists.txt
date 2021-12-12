@@ -26,7 +26,7 @@ if(NOT TARGET logging)
 
   set (LOGGING_VERSION_MAJOR 1)
   set (LOGGING_VERSION_MINOR 0)
-  set (LOGGING_VERSION_PATCH 1)
+  set (LOGGING_VERSION_PATCH 2)
   set (LOGGING_VERSION "${LOGGING_VERSION_MAJOR}.${LOGGING_VERSION_MINOR}.${LOGGING_VERSION_PATCH}")
 
   set (LOGGING_LIBRARIES logging::logging)
@@ -96,7 +96,7 @@ if(NOT TARGET logging)
   # header file to pass version settings to the source code
   configure_file (
     "${PROJECT_SOURCE_DIR}/version.h.in"
-    "${PROJECT_BINARY_DIR}/logging_version.h"
+    "${PROJECT_BINARY_DIR}/logging/logging_version.h"
   )
 
   set(SOURCE_FILES core.cpp
@@ -147,54 +147,57 @@ if(NOT TARGET logging)
   GENERATE_EXPORT_HEADER(logging
     BASE_NAME LOGGING
     EXPORT_MACRO_NAME LOGGING_EXPORT
-    EXPORT_FILE_NAME logging-export.h
+    EXPORT_FILE_NAME logging/logging-export.h
     STATIC_DEFINE LOGGING_BUILT_AS_STATIC_LIB
   )
 
   if (LOGGING_CONFIG_INSTALL)
-    set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/logging)
-    set (LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/logging)
+    set (LOGGING_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/logging)
+    set (LOGGING_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR}/cmake/logging)
 
     target_include_directories(logging
-                               PUBLIC
-                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-                               "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:${LOGGING_INSTALL_INCLUDEDIR}>
     )
 
-    write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/loggingConfigVersion.cmake
-                                     VERSION ${LOGGING_VERSION}
-                                     COMPATIBILITY SameMajorVersion)
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/loggingConfigVersion.cmake
+        VERSION ${LOGGING_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
 
-    configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-                                  "${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake"
-                                  INSTALL_DESTINATION ${LIBRARY_INSTALL_DIR}
-                                  PATH_VARS CMAKE_INSTALL_INCLUDEDIR)
+    configure_package_config_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake
+        INSTALL_DESTINATION ${LOGGING_INSTALL_LIBDIR}
+        PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+    )
 
     install(TARGETS logging
-            EXPORT loggingTargets
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            INCLUDES DESTINATION ${INCLUDE_INSTALL_DIR}
+        EXPORT loggingTargets
+        INCLUDES DESTINATION ${LOGGING_INSTALL_INCLUDEDIR}
     )
 
-    install(FILES ${INCLUDE_FILES}
-      ${PROJECT_BINARY_DIR}/logging-export.h
-      ${PROJECT_BINARY_DIR}/logging_version.h
-      DESTINATION ${INCLUDE_INSTALL_DIR})
+    install(FILES
+        ${INCLUDE_FILES}
+        ${PROJECT_BINARY_DIR}/logging/logging-export.h
+        ${PROJECT_BINARY_DIR}/logging/logging_version.h
+        DESTINATION ${LOGGING_INSTALL_INCLUDEDIR})
 
     install(EXPORT loggingTargets
-            FILE loggingTargets.cmake
-            NAMESPACE logging::
-            DESTINATION ${LIBRARY_INSTALL_DIR}
+        FILE loggingTargets.cmake
+        NAMESPACE logging::
+        DESTINATION ${LOGGING_INSTALL_LIBDIR}
     )
 
     export(TARGETS logging FILE loggingTargets.cmake)
 
     install(FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake"
-            "${CMAKE_CURRENT_BINARY_DIR}/loggingConfigVersion.cmake"
-            DESTINATION ${LIBRARY_INSTALL_DIR})
+        ${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/loggingConfigVersion.cmake
+        DESTINATION ${LOGGING_INSTALL_LIBDIR}
+    )
 
   endif()
 
