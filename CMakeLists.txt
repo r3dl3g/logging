@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project("logging" CXX)
+project("logging" LANGUAGES CXX VERSION 1.0.2)
 
 # see: http://stackoverflow.com/questions/23684789/cmake-build-multiple-executables-in-one-project-with-static-library
 
@@ -11,6 +11,17 @@ include (GNUInstallDirs)
 if(POLICY CMP0077)
   cmake_policy(SET CMP0077 NEW)
 endif()
+
+if(NOT DEFINED CMAKE_CXX_VISIBILITY_PRESET AND
+    NOT DEFINED CMAKE_VISIBILITY_INLINES_HIDDEN)
+  set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+  set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
+endif()
+
+set (LOGGING_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set (LOGGING_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set (LOGGING_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set (LOGGING_VERSION "${PROJECT_VERSION}")
 
 option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
 option(LOGGING_CONFIG_INSTALL "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
@@ -23,11 +34,6 @@ function(DebugPrint MSG)
 endfunction(DebugPrint)
 
 if(NOT TARGET logging)
-
-  set (LOGGING_VERSION_MAJOR 1)
-  set (LOGGING_VERSION_MINOR 0)
-  set (LOGGING_VERSION_PATCH 2)
-  set (LOGGING_VERSION "${LOGGING_VERSION_MAJOR}.${LOGGING_VERSION_MINOR}.${LOGGING_VERSION_PATCH}")
 
   set (LOGGING_LIBRARIES logging::logging)
 
