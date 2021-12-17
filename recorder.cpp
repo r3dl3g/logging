@@ -110,7 +110,7 @@ namespace logging {
     return *this;
   }
 
-  recorder& recorder::operator<< (const char* value) {
+  recorder& recorder::operator<< (char const* value) {
     if (value) {
       if (unescaped) {
         m_buffer << value;

@@ -72,7 +72,7 @@ namespace logging {
      * Specialized shift operator for character arrays.
      * If not in raw mode control characters will be escaped
      */
-    recorder& operator<< (const char* value);
+    recorder& operator<< (char const* value);
 
     /**
      * Specialized shift operator for std::strings.
