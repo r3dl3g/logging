@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 project("logging-test" CXX)
 
-add_subdirectory(./../../testing testing)
+add_subdirectory(./../libs/testing testing)
 
 include_directories(${PROJECT_BINARY_DIR} ${TESTING_INCLUDE_DIRS})
 
