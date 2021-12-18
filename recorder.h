@@ -43,6 +43,12 @@ namespace logging {
   /// convenience stream operator to print system_clock to ostream.
   LOGGING_EXPORT std::ostream& operator << (std::ostream& out, std::chrono::system_clock::time_point const& tp);
 
+  /// print date to ostream.
+  LOGGING_EXPORT void print_date (std::ostream& out, std::chrono::system_clock::time_point const& tp);
+
+  /// print time to ostream.
+  LOGGING_EXPORT void print_time (std::ostream& out, std::chrono::system_clock::time_point const& tp);
+
   /// convenience stream operator to print exception infos to ostream.
   LOGGING_EXPORT std::ostream& operator << (std::ostream& out, const std::exception& ex);
 

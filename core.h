@@ -33,6 +33,7 @@
 // Library includes
 //
 #include <logging/message_queue.h>
+#include <logging/formatter.h>
 
 #ifdef WIN32
 #pragma warning (disable: 4251)
@@ -42,11 +43,6 @@
 * Provides an API for stream logging to multiple sinks.
 */
 namespace logging {
-
-  /**
-    * Formatter functor definition.
-    */
-  typedef std::function<void(std::ostream& out, const record& entry)> record_formatter;
 
   /**
     * Sink description with target ostream, level to log and log record formatter

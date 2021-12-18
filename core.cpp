@@ -178,21 +178,15 @@ namespace logging {
   }
 
   record_formatter core::get_standard_formatter () {
-    return [](std::ostream& out, const record& e) {
-      out << e.line() << '|' << e.time_point() << '|' << e.level() << '|' << e.thread_name() << '|' << e.message() << std::endl;
-    };
+    return standard_formatter;
   }
 
   record_formatter core::get_no_time_formatter () {
-    return [](std::ostream& out, const record& e) {
-      out << e.level() << '|' << e.thread_name() << '|' << e.message() << std::endl;
-    };
+    return no_time_formatter;
   }
 
   record_formatter core::get_console_formatter () {
-    return [](std::ostream& out, const record& e) {
-      out << e.message() << std::endl;
-    };
+    return console_formatter;
   }
 
   void core::log (level lvl,

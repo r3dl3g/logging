@@ -42,6 +42,38 @@ namespace logging {
     return t;
   }
 
+  void print_date (std::ostream& out, std::chrono::system_clock::time_point const& tp) {
+    std::time_t now = std::chrono::system_clock::to_time_t(tp);
+    std::tm t = time_t2tm(now);
+
+    const auto fill = out.fill();
+    const auto width = out.width();
+
+    out << std::setfill('0')
+        << (t.tm_year + 1900) << '-'
+        << std::setw(2) << (t.tm_mon + 1) << '-'
+        << std::setw(2) << t.tm_mday;
+
+    out.fill(fill);
+    out.width(width);
+  }
+
+  void print_time (std::ostream& out, std::chrono::system_clock::time_point const& tp) {
+    std::time_t now = std::chrono::system_clock::to_time_t(tp);
+    std::tm t = time_t2tm(now);
+
+    const auto fill = out.fill();
+    const auto width = out.width();
+
+    out << std::setfill('0')
+        << std::setw(2) << t.tm_hour << ':'
+        << std::setw(2) << t.tm_min << ':'
+        << std::setw(2) << t.tm_sec;
+
+    out.fill(fill);
+    out.width(width);
+  }
+
   std::ostream& operator << (std::ostream& out, std::chrono::system_clock::time_point const& tp) {
     std::time_t now = std::chrono::system_clock::to_time_t(tp);
     std::tm t = time_t2tm(now);

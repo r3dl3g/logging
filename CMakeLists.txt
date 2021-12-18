@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project("logging" LANGUAGES CXX VERSION 1.0.2)
-
-# see: http://stackoverflow.com/questions/23684789/cmake-build-multiple-executables-in-one-project-with-static-library
+project("logging" LANGUAGES CXX VERSION 1.1.0)
 
 include (GenerateExportHeader)
 include (CMakePackageConfigHelpers)
@@ -26,6 +24,7 @@ set (LOGGING_VERSION "${PROJECT_VERSION}")
 option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
 option(LOGGING_CONFIG_INSTALL "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
 option(LOGGING_CXX_STANDARD "C++ standard to overwrite default cmake standard" ${CMAKE_CXX_STANDARD})
+option(LOGGING_TESTS "On to build the tests. Default Off" OFF)
 
 function(DebugPrint MSG)
   if(VERBOSE)
@@ -114,6 +113,7 @@ if(NOT TARGET logging)
   set(INCLUDE_FILES core.h
     core.inl
     dbgstream.h
+    formatter.h
     file_logger.h
     logger.h
     log_level.h
@@ -205,6 +205,10 @@ if(NOT TARGET logging)
         DESTINATION ${LOGGING_INSTALL_LIBDIR}
     )
 
+  endif()
+
+  if(LOGGING_TESTS)
+    add_subdirectory(tests)
   endif()
 
 endif()
