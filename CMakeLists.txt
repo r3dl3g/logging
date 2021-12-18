@@ -189,7 +189,9 @@ if(NOT TARGET logging)
         ${INCLUDE_FILES}
         ${PROJECT_BINARY_DIR}/logging/logging-export.h
         ${PROJECT_BINARY_DIR}/logging/logging_version.h
-        DESTINATION ${LOGGING_INSTALL_INCLUDEDIR})
+        LICENSE
+        DESTINATION ${LOGGING_INSTALL_INCLUDEDIR}
+    )
 
     install(EXPORT loggingTargets
         FILE loggingTargets.cmake
