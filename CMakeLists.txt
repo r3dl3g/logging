@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project("logging" LANGUAGES CXX VERSION 1.1.0)
+file(READ "derivation.nix" derivation_ver)
+string(REGEX MATCH "version = \"([0-9\.]+)\"" _ ${derivation_ver})
+set(project_version ${CMAKE_MATCH_1})
+
+message("Building logging version: ${project_version}")
+
+project("logging" LANGUAGES CXX VERSION ${project_version})
 
 include (GenerateExportHeader)
 include (CMakePackageConfigHelpers)
