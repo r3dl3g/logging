@@ -29,8 +29,8 @@ set (LOGGING_VERSION "${PROJECT_VERSION}")
 
 option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
 option(LOGGING_CONFIG_INSTALL "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
-option(LOGGING_CXX_STANDARD "C++ standard to overwrite default cmake standard" ${CMAKE_CXX_STANDARD})
 option(LOGGING_TESTS "On to build the tests. Default Off" OFF)
+set(LOGGING_CXX_STANDARD "${CMAKE_CXX_STANDARD}" CACHE STRING "C++ standard to overwrite default cmake standard")
 
 function(DebugPrint MSG)
   if(VERBOSE)
@@ -42,7 +42,7 @@ if(NOT TARGET logging)
 
   set (LOGGING_LIBRARIES logging::logging)
 
-  if (LOGGING_CXX_STANDARD STREQUAL "OFF")
+  if (LOGGING_CXX_STANDARD STREQUAL "")
     set (LOGGING_CXX_STANDARD 17)
   endif ()
 

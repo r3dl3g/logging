@@ -4,7 +4,7 @@
 
 stdenv.mkDerivation {
   pname = "logging";
-  version = "1.1.1";
+  version = "1.1.2";
 
   src = ./.;
 
