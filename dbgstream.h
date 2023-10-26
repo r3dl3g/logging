@@ -28,7 +28,7 @@
 #endif
 
 // --------------------------------------------------------------------------
-//2
+//
 // Library includes
 //
 #include <logging/redirect_stream.h>
