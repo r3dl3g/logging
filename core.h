@@ -89,6 +89,12 @@ namespace logging {
     /// remove all sinks
     void remove_all_sinks ();
 
+    /// set a global log level
+    void set_log_level (level lvl);
+
+    /// get the global log level
+    level get_log_level () const;
+
     /// get a standard formatter
     static record_formatter get_standard_formatter ();
 
@@ -120,6 +126,8 @@ namespace logging {
     static void logging_sink_call (core* core);
 
     void log_to_sinks (record&& entry);
+
+    level m_level;
 
     volatile bool m_is_active;
     std::atomic_uint m_line_id{};

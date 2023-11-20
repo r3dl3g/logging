@@ -125,7 +125,8 @@ namespace logging {
   }
 
   core::core ()
-    : m_is_active(false)
+    : m_level(level::info)
+    , m_is_active(false)
     , m_line_id(0)
   {
     start();
@@ -133,6 +134,14 @@ namespace logging {
 
   core::~core () {
     finish();
+  }
+
+  void core::set_log_level (level lvl) {
+    m_level = lvl;
+  }
+
+  level core::get_log_level () const {
+    return m_level;
   }
 
   void core::start () {
@@ -211,7 +220,7 @@ namespace logging {
   }
 
   void core::log_to_sinks (record&& entry) {
-    if (entry.level() != level::undefined) {
+    if (entry.level() >= m_level) {
       std::lock_guard<std::mutex> lock(m_mutex);
       for (auto& s : m_sinks) {
         if (entry.level() >= s.m_level) {
