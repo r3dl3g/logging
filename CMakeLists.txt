@@ -12,6 +12,10 @@ include (GenerateExportHeader)
 include (CMakePackageConfigHelpers)
 include (GNUInstallDirs)
 
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/obj)
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 if(POLICY CMP0077)
   cmake_policy(SET CMP0077 NEW)
 endif()
@@ -41,10 +45,6 @@ endfunction(DebugPrint)
 if(NOT TARGET logging)
 
   set (LOGGING_LIBRARIES logging::logging)
-
-  if (LOGGING_CXX_STANDARD STREQUAL "")
-    set (LOGGING_CXX_STANDARD 17)
-  endif ()
 
   set (LOGGING_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -149,9 +149,9 @@ if(NOT TARGET logging)
   )
 
   if(LOGGING_BUILD_STATIC_MODULE_LIB)
-    DebugPrint("LOGGING: Create static Library")
+    message(STATUS "Build LOGGING as static Library")
   else()
-    DebugPrint("LOGGING: Create shared Library")
+    message(STATUS "Build LOGGING as shared Library")
 
     target_link_libraries(logging PRIVATE ${LOGGING_SYS_LIBRARIES})
   endif()
