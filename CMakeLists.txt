@@ -46,6 +46,10 @@ if(NOT TARGET logging)
 
   set (LOGGING_LIBRARIES logging::logging)
 
+  if (LOGGING_CXX_STANDARD STREQUAL "")
+    set (LOGGING_CXX_STANDARD 17)
+  endif ()
+
   set (LOGGING_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_BINARY_DIR}/..
