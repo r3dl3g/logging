@@ -31,8 +31,8 @@ set (LOGGING_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set (LOGGING_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 set (LOGGING_VERSION "${PROJECT_VERSION}")
 
-option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" ON)
-option(LOGGING_CONFIG_INSTALL "On to make an installable standalone build, Off to build as part of a project. Default Off" OFF)
+option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" OFF)
+option(LOGGING_CONFIG_INSTALL "On to make an installable standalone build, Off to build as part of a project. Default Off" ON)
 option(LOGGING_TESTS "On to build the tests. Default Off" OFF)
 set(LOGGING_CXX_STANDARD "${CMAKE_CXX_STANDARD}" CACHE STRING "C++ standard to overwrite default cmake standard")
 
