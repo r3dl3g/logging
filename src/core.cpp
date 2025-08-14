@@ -91,8 +91,8 @@ namespace sys_fs = boost::filesystem;
 // Library includes
 //
 
-#include <logging/core.h>
-#include <logging/recorder.h>
+#include "core.h"
+#include "recorder.h"
 
 
 #if !defined(LOGGING_BUILT_AS_STATIC_LIB)

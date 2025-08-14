@@ -32,8 +32,8 @@
 //
 // Library includes
 //
-#include <logging/message_queue.h>
-#include <logging/formatter.h>
+#include "message_queue.h"
+#include "formatter.h"
 
 #ifdef WIN32
 #pragma warning (disable: 4251)
@@ -143,7 +143,7 @@ namespace logging {
 
 } // namespace logging
 
-#include <logging/core.inl>
+#include "core.inl"
 
 /**
 * Since statics are not shared over DLL boundaries, we have

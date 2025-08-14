@@ -28,7 +28,7 @@
 // Library includes
 //
 
-#include <logging/record.h>
+#include "record.h"
 
 
 namespace logging {

@@ -90,4 +90,4 @@ namespace logging {
 
 } // namespace logging
 
-#include <logging/record.inl>
+#include "record.inl"

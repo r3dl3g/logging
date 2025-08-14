@@ -26,7 +26,7 @@
 //
 // Library includes
 //
-#include <logging/logging-export.h>
+#include "logging-export.h"
 
 
 /**

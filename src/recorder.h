@@ -29,7 +29,7 @@
 //
 // Library includes
 //
-#include <logging/log_level.h>
+#include "log_level.h"
 
 #ifdef WIN32
 #pragma warning (disable: 4251)
@@ -124,5 +124,5 @@ namespace logging {
 
 } // namespace logging
 
-#include <logging/recorder.inl>
+#include "recorder.inl"
 

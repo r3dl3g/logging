@@ -25,9 +25,9 @@
 //
 // Library includes
 //
-#include <logging/record.h>
-#include <logging/recorder.h>
-#include <logging/logging-export.h>
+#include "record.h"
+#include "recorder.h"
+#include "logging-export.h"
 
 
 /**

@@ -51,10 +51,10 @@ if(NOT TARGET logging)
   endif ()
 
   set (LOGGING_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_BINARY_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_BINARY_DIR}/inc
     ${PROJECT_BINARY_DIR}
-    )
+  )
 
   set (LOGGING_CXX_FLAGS "-DUSE_LOGGING_LIB")
 
@@ -110,29 +110,31 @@ if(NOT TARGET logging)
 
   # header file to pass version settings to the source code
   configure_file (
-    "${PROJECT_SOURCE_DIR}/version.h.in"
-    "${PROJECT_BINARY_DIR}/logging/logging_version.h"
+    "${PROJECT_SOURCE_DIR}/src/version.h.in"
+    "${PROJECT_BINARY_DIR}/inc/logging_version.h"
   )
 
-  set(SOURCE_FILES core.cpp
-    log_level.cpp
-    message_queue.cpp
-    record.cpp
-    recorder.cpp
+  set(SOURCE_FILES
+    src/core.cpp
+    src/log_level.cpp
+    src/message_queue.cpp
+    src/record.cpp
+    src/recorder.cpp
   )
-  set(INCLUDE_FILES core.h
-    core.inl
-    dbgstream.h
-    formatter.h
-    file_logger.h
-    logger.h
-    log_level.h
-    message_queue.h
-    recorder.h
-    recorder.inl
-    record.h
-    record.inl
-    redirect_stream.h
+  set(INCLUDE_FILES
+    src/core.h
+    src/core.inl
+    src/dbgstream.h
+    src/formatter.h
+    src/file_logger.h
+    src/logger.h
+    src/log_level.h
+    src/message_queue.h
+    src/recorder.h
+    src/recorder.inl
+    src/record.h
+    src/record.inl
+    src/redirect_stream.h
   )
 
   if (NOT ANDROID)
@@ -163,7 +165,7 @@ if(NOT TARGET logging)
   GENERATE_EXPORT_HEADER(logging
     BASE_NAME LOGGING
     EXPORT_MACRO_NAME LOGGING_EXPORT
-    EXPORT_FILE_NAME logging/logging-export.h
+    EXPORT_FILE_NAME inc/logging-export.h
     STATIC_DEFINE LOGGING_BUILT_AS_STATIC_LIB
   )
 
@@ -197,8 +199,8 @@ if(NOT TARGET logging)
 
     install(FILES
         ${INCLUDE_FILES}
-        ${PROJECT_BINARY_DIR}/logging/logging-export.h
-        ${PROJECT_BINARY_DIR}/logging/logging_version.h
+        ${PROJECT_BINARY_DIR}/inc/logging-export.h
+        ${PROJECT_BINARY_DIR}/inc/logging_version.h
         LICENSE
         DESTINATION ${LOGGING_INSTALL_INCLUDEDIR}
     )

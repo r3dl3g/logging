@@ -25,7 +25,7 @@
 //
 // Library includes
 //
-#include <logging/log_level.h>
+#include "log_level.h"
 
 
 namespace logging {

@@ -20,7 +20,7 @@
 //
 // Library includes
 //
-#include <logging/recorder.h>
+#include "recorder.h"
 
 namespace logging {
 

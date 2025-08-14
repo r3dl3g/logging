@@ -31,8 +31,8 @@
 //
 // Library includes
 //
-#include <logging/redirect_stream.h>
-#include <logging/core.h>
+#include "redirect_stream.h"
+#include "core.h"
 
 
 /**

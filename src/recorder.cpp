@@ -25,8 +25,8 @@
 // Library includes
 //
 
-#include <logging/recorder.h>
-#include <logging/core.h>
+#include "recorder.h"
+#include "core.h"
 
 
 namespace logging {
