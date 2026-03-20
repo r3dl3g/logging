@@ -57,6 +57,29 @@ log_rotate() {
   mv $LOGDIR/$ACTION.log $ARCHIVE/${ACTION}.1.log
 }
 
+log_rename() {
+  base=$ACTION$1.log
+  next=$ACTION$2.log
+  if [ -f $base ]; then
+    mv -f $base $next
+  fi
+}
+
+log_rotate() {
+  mkdir -p $ARCHIVE
+  for i in ${ACTION}.*.log; do
+    mv $i $ARCHIVE/$i
+  done
+  pushd $ARCHIVE
+  next=10
+  for i in {9..1}; do
+    log_rename .$i .$next
+    next=$i
+  done
+  popd
+  mv $ACTION.log $ARCHIVE/${ACTION}.1.log
+}
+
 do_logged() {
   command=$1
   shift
