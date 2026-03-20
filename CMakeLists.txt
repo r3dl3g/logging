@@ -12,10 +12,6 @@ include (GenerateExportHeader)
 include (CMakePackageConfigHelpers)
 include (GNUInstallDirs)
 
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/obj)
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 if(POLICY CMP0077)
   cmake_policy(SET CMP0077 NEW)
 endif()
@@ -33,6 +29,7 @@ set (LOGGING_VERSION "${PROJECT_VERSION}")
 
 option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each submodule, Off for shared library. default On" OFF)
 option(LOGGING_CONFIG_INSTALL "On to make an installable standalone build, Off to build as part of a project. Default Off" ON)
+option(LOGGING_BUILD_DEPENDENT_LIBS "On to build dependent lib testlib. Default Off" OFF)
 option(LOGGING_TESTS "On to build the tests. Default Off" OFF)
 set(LOGGING_CXX_STANDARD "${CMAKE_CXX_STANDARD}" CACHE STRING "C++ standard to overwrite default cmake standard")
 
@@ -60,16 +57,16 @@ if(NOT TARGET logging)
 
   if (APPLE)
     set (LOGGING_SYS_LIBRARIES pthread)
-    set (LOGGING_INCLUDE_DIRS ${LOGGING_INCLUDE_DIRS} /usr/local/include)
+    set (LOGGING_INCLUDE_DIRS ${LOGGING_INCLUDE_DIRS} ${CMAKE_INSTALL_PREFIX}/include)
   elseif (ANDROID)
     set(LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DANDROID)
   elseif (EMSCRIPTEN)
-    set(LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DUSE_FILE_TIME_POINT -DUSE_EMSCRIPT)
+    set(LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DUSE_EMSCRIPT)
+    set(LOGGING_BUILD_STATIC_MODULE_LIB ON)
   elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR
       ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND NOT (CMAKE_CXX_PLATFORM_ID STREQUAL "Windows")) AND NOT ((CMAKE_CXX_PLATFORM_ID STREQUAL "MinGW")))
     set (LOGGING_SYS_LIBRARIES stdc++fs pthread)
   endif ()
-
 
   if (WIN32)
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DWIN32_LEAN_AND_MEAN)
@@ -222,6 +219,7 @@ if(NOT TARGET logging)
   endif()
 
   if(LOGGING_TESTS)
+    set(testing_DIR ${CMAKE_PREFIX_PATH}/lib/cmake/testing)
     add_subdirectory(tests)
   endif()
 

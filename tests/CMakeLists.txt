@@ -1,8 +1,12 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 project("logging-test" CXX)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/libs/testing testing)
+if(LOGGING_BUILD_DEPENDENT_LIBS)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libs/testing testing)
+else()
+  find_package(testing REQUIRED)
+endif()
 
 include_directories(${PROJECT_BINARY_DIR} ${TESTING_INCLUDE_DIRS})
 
@@ -16,7 +20,7 @@ add_definitions(${LOGGING_CXX_FLAGS})
 
 foreach(test ${tests})
     add_executable(${test} WIN32 ${test}.cpp)
-    target_link_libraries(${test} testing ${LOGGING_LIBRARIES} ${LOGGING_SYS_LIBRARIES})
+    target_link_libraries(${test} ${TESTING_LIBRARIES} ${LOGGING_LIBRARIES} ${LOGGING_SYS_LIBRARIES})
     add_test(${test} ${CMAKE_CURRENT_BINARY_DIR}/${test})
     set_target_properties(${test} PROPERTIES
                           FOLDER tests
