@@ -31,6 +31,7 @@ option(LOGGING_BUILD_STATIC_MODULE_LIB "On to build a static library for each su
 option(LOGGING_CONFIG_INSTALL "On to make an installable standalone build, Off to build as part of a project. Default Off" ON)
 option(LOGGING_BUILD_DEPENDENT_LIBS "On to build dependent lib testlib. Default Off" OFF)
 option(LOGGING_TESTS "On to build the tests. Default Off" OFF)
+option(LOGGING_NO_THREAD "Run logging core without a background thread. Default Off" OFF)
 set(LOGGING_CXX_STANDARD "${CMAKE_CXX_STANDARD}" CACHE STRING "C++ standard to overwrite default cmake standard")
 
 function(DebugPrint MSG)
@@ -61,7 +62,7 @@ if(NOT TARGET logging)
   elseif (ANDROID)
     set(LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DANDROID)
   elseif (EMSCRIPTEN)
-    set(LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DUSE_EMSCRIPT -pthread -matomics)
+    set(LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DUSE_EMSCRIPT -sNO_DISABLE_EXCEPTION_CATCHING -matomics)
     set(LOGGING_BUILD_STATIC_MODULE_LIB ON)
   elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR
       ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND NOT (CMAKE_CXX_PLATFORM_ID STREQUAL "Windows")) AND NOT ((CMAKE_CXX_PLATFORM_ID STREQUAL "MinGW")))
@@ -77,6 +78,10 @@ if(NOT TARGET logging)
     set (LOGGING_LINK STATIC)
   else()
     set (LOGGING_LINK SHARED)
+  endif()
+
+  if (LOGGING_NO_THREAD)
+  set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DLOGGING_NO_THREAD)
   endif()
 
   if(CMAKE_CXX_PLATFORM_ID STREQUAL "MinGW")

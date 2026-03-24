@@ -1,4 +1,4 @@
 . ./.project_defines
 
-prepare Debug
-prepare Release
+prepare Debug -DLOGGING_TESTS=ON
+prepare Release -DLOGGING_TESTS=ON

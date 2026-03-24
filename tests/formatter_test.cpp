@@ -14,9 +14,13 @@ void test_console_formatter () {
   core.remove_all_sinks();
   std::ostringstream buffer;
   core.add_sink(&buffer, logging::level::debug, core.get_console_formatter());
-  logging::debug() << "test";
+  if (true) {
+    logging::debug() << "test";
+  }
   core.flush();
   core.remove_sink(&buffer);
+
+  std::cout << "buffer: '" << buffer.str() << "'" << std::endl;
 
   EXPECT_EQUAL(buffer.str(), std::string("test\n"));
 }
