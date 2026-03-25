@@ -137,8 +137,10 @@ namespace logging {
 
     sink_list m_sinks;
 
+#ifndef LOGGING_NO_THREAD
     message_queue m_messages;
     std::thread m_sink_thread;
+#endif //LOGGING_NO_THREAD
   };
 
 } // namespace logging

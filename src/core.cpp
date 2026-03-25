@@ -115,6 +115,7 @@ namespace logging {
 
   thread_local const char* t_thread_name = "main";
 
+#ifndef LOGGING_NO_THREAD
   void core::logging_sink_call (core* core) {
     while (core->m_is_active) {
       record entry = core->m_messages.dequeue();
@@ -123,6 +124,7 @@ namespace logging {
       } while (core->m_messages.try_dequeue(entry));
     }
   }
+#endif //LOGGING_NO_THREAD
 
   core::core ()
     : m_level(level::info)
@@ -145,8 +147,10 @@ namespace logging {
   }
 
   void core::start () {
+#ifndef LOGGING_NO_THREAD
     if (!m_is_active) {
       m_is_active = true;
+#endif //LOGGING_NO_THREAD
       add_sink(&std::clog,
 #ifdef NDEBUG
                level::info
@@ -154,12 +158,14 @@ namespace logging {
                level::trace
 #endif
                , get_standard_formatter());
-
+#ifndef LOGGING_NO_THREAD
       m_sink_thread = std::thread(core::logging_sink_call, this);
     }
+#endif //LOGGING_NO_THREAD
   }
 
   void core::finish () {
+#ifndef LOGGING_NO_THREAD
     if (m_is_active) {
       m_messages.wait_until_empty(std::chrono::milliseconds(
 #ifdef NDEBUG
@@ -172,9 +178,11 @@ namespace logging {
       m_messages.enqueue(record());
       m_sink_thread.join();
     }
+#endif //LOGGING_NO_THREAD
   }
 
   void core::flush () {
+#ifndef LOGGING_NO_THREAD
     if (m_is_active) {
       m_messages.wait_until_empty(std::chrono::milliseconds(
 #ifdef NDEBUG
@@ -184,6 +192,7 @@ namespace logging {
 #endif
       ));
     }
+#endif //LOGGING_NO_THREAD
   }
 
   record_formatter core::get_standard_formatter () {
@@ -208,6 +217,7 @@ namespace logging {
                   std::string&& message) {
     unsigned int id = ++m_line_id;
     record r(time_point, lvl, t_thread_name, line_id(id), std::move(message));
+#ifndef LOGGING_NO_THREAD
     if (m_is_active) {
       m_messages.enqueue(std::move(r));
       if (lvl >= level::error) {
@@ -215,8 +225,11 @@ namespace logging {
         m_messages.wait_until_empty(std::chrono::milliseconds(1000));
       }
     } else {
+#endif //LOGGING_NO_THREAD
       log_to_sinks(std::move(r));
+#ifndef LOGGING_NO_THREAD
     }
+#endif //LOGGING_NO_THREAD
   }
 
   void core::log_to_sinks (record&& entry) {
