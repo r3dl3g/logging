@@ -18,8 +18,6 @@ void test_console_formatter () {
   core.flush();
   core.remove_sink(&buffer);
 
-  std::cout << "buffer: '" << buffer.str() << "'" << std::endl;
-
   EXPECT_EQUAL(buffer.str(), std::string("test\n"));
 }
 
