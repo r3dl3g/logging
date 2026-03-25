@@ -13,8 +13,8 @@ void test_console_formatter () {
   logging::core& core = logging::core::instance();
   core.remove_all_sinks();
   std::ostringstream buffer;
-  core.add_sink(&buffer, logging::level::debug, core.get_console_formatter());
-  logging::debug() << "test";
+  core.add_sink(&buffer, logging::level::info, core.get_console_formatter());
+  logging::info() << "test";
   core.flush();
   core.remove_sink(&buffer);
 
@@ -26,12 +26,12 @@ void test_no_time_formatter () {
   logging::core& core = logging::core::instance();
   core.remove_all_sinks();
   std::ostringstream buffer;
-  core.add_sink(&buffer, logging::level::debug, core.get_no_time_formatter());
-  logging::debug() << "test2";
+  core.add_sink(&buffer, logging::level::info, core.get_no_time_formatter());
+  logging::info() << "test2";
   core.flush();
   core.remove_sink(&buffer);
 
-  EXPECT_EQUAL(buffer.str(), std::string("debug|main|test2\n"));
+  EXPECT_EQUAL(buffer.str(), std::string("info |main|test2\n"));
 }
 
 // --------------------------------------------------------------------------
@@ -44,12 +44,12 @@ void test_standard_formatter () {
   logging::core& core = logging::core::instance();
   core.remove_all_sinks();
   std::ostringstream buffer;
-  core.add_sink(&buffer, logging::level::debug, core.get_standard_formatter());
-  logging::debug() << "test3";
+  core.add_sink(&buffer, logging::level::info, core.get_standard_formatter());
+  logging::info() << "test3";
   core.flush();
   core.remove_sink(&buffer);
 
-  EXPECT_REGEX(buffer.str(), std::string("0003\\|.*\\|debug\\|main\\|test3\n"));
+  EXPECT_REGEX(buffer.str(), std::string("0003\\|.*\\|info \\|main\\|test3\n"));
 }
 
 // --------------------------------------------------------------------------
@@ -60,12 +60,12 @@ void test_custom_formatter () {
   auto fmt = [] (std::ostream& out, const logging::record& e) {
     out << "(" << e.line() << "," << e.level() << "," << e.thread_name() << "," << e.message() << ")";
   };
-  core.add_sink(&buffer, logging::level::debug, fmt);
-  logging::debug() << "test4";
+  core.add_sink(&buffer, logging::level::info, fmt);
+  logging::info() << "test4";
   core.flush();
   core.remove_sink(&buffer);
 
-  EXPECT_EQUAL(buffer.str(), std::string("(0004,debug,main,test4)"));
+  EXPECT_EQUAL(buffer.str(), std::string("(0004,info ,main,test4)"));
 }
 
 // --------------------------------------------------------------------------
@@ -77,12 +77,12 @@ void test_dynamic_formatter () {
   using namespace logging;
 
   auto delem = fmt::constant("'/'");
-  core.add_sink(&buffer, level::debug, custom_formatter({fmt::line, fmt::character<':'>, fmt::thread, delem, fmt::level, delem, fmt::message, fmt::endl}));
-  logging::debug() << "test5";
+  core.add_sink(&buffer, level::info, custom_formatter({fmt::line, fmt::character<':'>, fmt::thread, delem, fmt::level, delem, fmt::message, fmt::endl}));
+  logging::info() << "test5";
   core.flush();
   core.remove_sink(&buffer);
 
-  EXPECT_EQUAL(buffer.str(), std::string("0005:main'/'debug'/'test5\n"));
+  EXPECT_EQUAL(buffer.str(), std::string("0005:main'/'info '/'test5\n"));
 }
 
 // --------------------------------------------------------------------------
@@ -101,8 +101,8 @@ void test_date_and_time_formatter () {
 
   using namespace logging;
 
-  core.add_sink(&buffer, level::debug, custom_formatter({fmt::date, fmt::character<'T'>, fmt::time, fmt::constant(": "), fmt::message, fmt::endl}));
-  logging::debug() << "test6";
+  core.add_sink(&buffer, level::info, custom_formatter({fmt::date, fmt::character<'T'>, fmt::time, fmt::constant(": "), fmt::message, fmt::endl}));
+  logging::info() << "test6";
   core.flush();
   core.remove_sink(&buffer);
 
