@@ -2,9 +2,9 @@
 #include <iomanip>
 
 #include <testing/testing.h>
-#include <logging/logger.h>
-#include <logging/core.h>
-#include <logging/formatter.h>
+#include "logger.h"
+#include "core.h"
+#include "formatter.h"
 
 DEFINE_LOGGING_CORE()
 
