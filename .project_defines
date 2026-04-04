@@ -3,13 +3,19 @@
 SCRIPT_NAME=$(basename $0)
 ACTION=${SCRIPT_NAME/.sh/}
 PROJECT=${PWD##*/}
+if [ -n "$PLATFORM" ]; then
+  PROJECT=$PROJECT/$PLATFORM
+fi
 INSTALL_PREFIX=~/.local
+if [ -n "$PLATFORM" ]; then
+  INSTALL_PREFIX=~/.local/$PLATFORM
+fi
 BUILD_PREFIX=~/.cache/build
 PARALLEL=$(nproc)
 DEFINES=
 TYPE=undefined
 ARCHIVE=./archive
-LOGDIR=.
+LOGDIR=./logs
 LOGFILE=$LOGDIR/$ACTION.log
 CMAKE_CMD=cmake
 
@@ -37,12 +43,13 @@ _clean() {
 log_rename() {
   base=$ACTION$1.log
   next=$ACTION$2.log
-  if [ -f $base ]; then
+  if [ -e $base ]; then
     mv -f $base $next
   fi
 }
 
 log_rotate() {
+  mkdir -p $LOGDIR
   mkdir -p $ARCHIVE
   for i in ${ACTION}.*.log; do
     mv $i $ARCHIVE/$i
@@ -55,29 +62,6 @@ log_rotate() {
   done
   popd
   mv $LOGDIR/$ACTION.log $ARCHIVE/${ACTION}.1.log
-}
-
-log_rename() {
-  base=$ACTION$1.log
-  next=$ACTION$2.log
-  if [ -f $base ]; then
-    mv -f $base $next
-  fi
-}
-
-log_rotate() {
-  mkdir -p $ARCHIVE
-  for i in ${ACTION}.*.log; do
-    mv $i $ARCHIVE/$i
-  done
-  pushd $ARCHIVE
-  next=10
-  for i in {9..1}; do
-    log_rename .$i .$next
-    next=$i
-  done
-  popd
-  mv $ACTION.log $ARCHIVE/${ACTION}.1.log
 }
 
 do_logged() {
