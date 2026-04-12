@@ -172,13 +172,22 @@ if(NOT TARGET logging)
   )
 
   if (LOGGING_CONFIG_INSTALL)
-    set (LOGGING_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/logging)
-    set (LOGGING_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR}/cmake/logging)
+
+  if (CMAKE_CXX_PLATFORM_ID STREQUAL MinGW)
+      set(OUTPUT_NAME logging-mingw)
+    elseif(EMSCRIPTEN)
+      set(OUTPUT_NAME logging-emc)
+    else()
+      set(OUTPUT_NAME logging)
+    endif()
+
+    set (LOGGING_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_INCLUDEDIR}/logging)
+    set (LOGGING_INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${OUTPUT_NAME})
 
     target_include_directories(logging
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:${LOGGING_INSTALL_INCLUDEDIR}>
+        $<INSTALL_INTERFACE:${LOGGING_INSTALL_INCLUDE_DIR}>
     )
 
     write_basic_package_version_file(
@@ -190,13 +199,13 @@ if(NOT TARGET logging)
     configure_package_config_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake
-        INSTALL_DESTINATION ${LOGGING_INSTALL_LIBDIR}
+        INSTALL_DESTINATION ${LOGGING_INSTALL_CMAKE_DIR}
         PATH_VARS CMAKE_INSTALL_INCLUDEDIR
     )
 
     install(TARGETS logging
         EXPORT loggingTargets
-        INCLUDES DESTINATION ${LOGGING_INSTALL_INCLUDEDIR}
+        INCLUDES DESTINATION ${LOGGING_INSTALL_INCLUDE_DIR}
     )
 
     install(FILES
@@ -204,13 +213,13 @@ if(NOT TARGET logging)
         ${PROJECT_BINARY_DIR}/inc/logging-export.h
         ${PROJECT_BINARY_DIR}/inc/logging_version.h
         LICENSE
-        DESTINATION ${LOGGING_INSTALL_INCLUDEDIR}
+        DESTINATION ${LOGGING_INSTALL_INCLUDE_DIR}
     )
 
     install(EXPORT loggingTargets
         FILE loggingTargets.cmake
         NAMESPACE logging::
-        DESTINATION ${LOGGING_INSTALL_LIBDIR}
+        DESTINATION ${LOGGING_INSTALL_CMAKE_DIR}
     )
 
     export(TARGETS logging FILE loggingTargets.cmake)
@@ -218,7 +227,7 @@ if(NOT TARGET logging)
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/loggingConfigVersion.cmake
-        DESTINATION ${LOGGING_INSTALL_LIBDIR}
+        DESTINATION ${LOGGING_INSTALL_CMAKE_DIR}
     )
 
   endif()
