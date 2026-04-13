@@ -8,7 +8,7 @@ else()
   find_package(testing REQUIRED)
 endif()
 
-include_directories(${PROJECT_BINARY_DIR} ${TESTING_INCLUDE_DIRS})
+include_directories(${TESTING_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/src)
 
 enable_testing()
 

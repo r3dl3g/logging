@@ -42,17 +42,11 @@ endfunction(DebugPrint)
 
 if(NOT TARGET logging)
 
-  set (LOGGING_LIBRARIES logging::logging)
-
   if (LOGGING_CXX_STANDARD STREQUAL "")
     set (LOGGING_CXX_STANDARD 17)
   endif ()
 
-  set (LOGGING_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_BINARY_DIR}/inc
-    ${PROJECT_BINARY_DIR}
-  )
+  set (LOGGING_LIBRARIES logging::logging)
 
   set (LOGGING_CXX_FLAGS "-DUSE_LOGGING_LIB")
 
@@ -73,6 +67,15 @@ if(NOT TARGET logging)
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DWIN32_LEAN_AND_MEAN)
   endif (WIN32)
 
+  if(CMAKE_CXX_PLATFORM_ID STREQUAL "MinGW")
+    set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DUSE_MINGW)
+    set (LOGGING_SYS_LIBRARIES stdc++fs)
+    if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "10.0.0")
+      set (LOGGING_SYS_LIBRARIES ${LOGGING_SYS_LIBRARIES} pthread)
+    endif()
+    set(LOGGING_BUILD_STATIC_MODULE_LIB ON)
+  endif()
+
   if (LOGGING_BUILD_STATIC_MODULE_LIB)
     set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DLOGGING_BUILT_AS_STATIC_LIB)
     set (LOGGING_LINK STATIC)
@@ -82,14 +85,6 @@ if(NOT TARGET logging)
 
   if (LOGGING_NO_THREAD)
   set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DLOGGING_NO_THREAD)
-  endif()
-
-  if(CMAKE_CXX_PLATFORM_ID STREQUAL "MinGW")
-    set (LOGGING_CXX_FLAGS ${LOGGING_CXX_FLAGS} -DUSE_MINGW)
-    set (LOGGING_SYS_LIBRARIES stdc++fs)
-    if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "10.0.0")
-      set (LOGGING_SYS_LIBRARIES ${LOGGING_SYS_LIBRARIES} pthread)
-    endif()
   endif()
 
   get_directory_property(hasParent PARENT_DIRECTORY)
@@ -108,12 +103,12 @@ if(NOT TARGET logging)
   DebugPrint("LOGGING_SYS_LIBRARIES: ${LOGGING_SYS_LIBRARIES}")
   DebugPrint("LOGGING_CXX_STANDARD: ${LOGGING_CXX_STANDARD}")
 
-  include_directories(${LOGGING_INCLUDE_DIRS})
+  include_directories(${LOGGING_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 
   # header file to pass version settings to the source code
   configure_file (
     "${PROJECT_SOURCE_DIR}/src/version.h.in"
-    "${PROJECT_BINARY_DIR}/inc/logging_version.h"
+    "${PROJECT_BINARY_DIR}/logging_version.h"
   )
 
   set(SOURCE_FILES
@@ -167,22 +162,14 @@ if(NOT TARGET logging)
   GENERATE_EXPORT_HEADER(logging
     BASE_NAME LOGGING
     EXPORT_MACRO_NAME LOGGING_EXPORT
-    EXPORT_FILE_NAME inc/logging-export.h
+    EXPORT_FILE_NAME logging-export.h
     STATIC_DEFINE LOGGING_BUILT_AS_STATIC_LIB
   )
 
   if (LOGGING_CONFIG_INSTALL)
 
-  if (CMAKE_CXX_PLATFORM_ID STREQUAL MinGW)
-      set(OUTPUT_NAME logging-mingw)
-    elseif(EMSCRIPTEN)
-      set(OUTPUT_NAME logging-emc)
-    else()
-      set(OUTPUT_NAME logging)
-    endif()
-
     set (LOGGING_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_INCLUDEDIR}/logging)
-    set (LOGGING_INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${OUTPUT_NAME})
+    set (LOGGING_INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/logging)
 
     target_include_directories(logging
         PUBLIC
@@ -201,6 +188,7 @@ if(NOT TARGET logging)
         ${CMAKE_CURRENT_BINARY_DIR}/loggingConfig.cmake
         INSTALL_DESTINATION ${LOGGING_INSTALL_CMAKE_DIR}
         PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+        NO_SET_AND_CHECK_MACRO
     )
 
     install(TARGETS logging
@@ -210,8 +198,8 @@ if(NOT TARGET logging)
 
     install(FILES
         ${INCLUDE_FILES}
-        ${PROJECT_BINARY_DIR}/inc/logging-export.h
-        ${PROJECT_BINARY_DIR}/inc/logging_version.h
+        ${PROJECT_BINARY_DIR}/logging-export.h
+        ${PROJECT_BINARY_DIR}/logging_version.h
         LICENSE
         DESTINATION ${LOGGING_INSTALL_INCLUDE_DIR}
     )
